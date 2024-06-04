@@ -23,3 +23,9 @@ In order to run server :
 ```bash
 cd server && npm run dev
 ```
+
+To seed database : 
+
+```bash
+cd server && node seed.js
+```
