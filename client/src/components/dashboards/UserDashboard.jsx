@@ -5,14 +5,22 @@ import { AuthContext } from '../../context/AuthContext';
 import Auth from '../../utils/Auth';
 import * as XLSX from 'xlsx'; 
 import Navbar from '../Navbar';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faSearch } from '@fortawesome/free-solid-svg-icons';
 
 const UserDashboard = () => {
   const { user } = useContext(AuthContext);
   const [forms, setForms] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [importError, setImportError] = useState(null); // State for import errors
+  const [searchTerm, setSearchTerm] = useState('');
+  const [filterColumn, setFilterColumn] = useState(''); // Initial filter column
+  const [sortDirection, setSortDirection] = useState('');
+  const [currentPage, setCurrentPage] = useState(1);
+  const [rowsPerPage, setRowsPerPage] = useState(5); // Initial rows per page
 
   useEffect(() => {
+
     const fetchForms = async () => {
       try {
         const response = await axios.get('/user/forms', {
@@ -30,8 +38,67 @@ const UserDashboard = () => {
     if (user) {
       fetchForms();
     }
+
   }, [user]);
 
+  // Function to handle search input
+  const handleSearchChange = (event) => {
+    setSearchTerm(event.target.value);
+  };
+
+  // Function to handle filter column selection
+  const handleFilterChange = (event) => {
+    setFilterColumn(event.target.value);
+  };
+
+  // Function to handle sort direction selection
+  const handleSortChange = (event) => {
+    setSortDirection(event.target.value);
+  };
+
+  // Function to handle page change
+  const handlePageChange = (pageNumber) => {
+    setCurrentPage(pageNumber);
+  };
+
+  // Function to handle rows per page change
+  const handleRowsPerPageChange = (event) => {
+    setRowsPerPage(parseInt(event.target.value, 10));
+  };
+
+  // Filter, sort, and paginate data
+  const filteredForms = forms.filter((form) => {
+    // Search filter
+    if (searchTerm) {
+      const searchTermLower = searchTerm.toLowerCase() || '';
+      const formValue = form.formData[filterColumn].toLowerCase();
+      return formValue.includes(searchTermLower);
+    }
+    return true;
+  });
+
+  // Sort data
+  const sortedForms = [...filteredForms].sort((a, b) => {
+    const columnValueA = a.formData[filterColumn];
+    const columnValueB = b.formData[filterColumn];
+
+    if (sortDirection === 'asc') {
+      return columnValueA > columnValueB ? 1 : -1; 
+    } else if (sortDirection === 'desc') {
+      return columnValueA < columnValueB ? 1 : -1; 
+    } else {
+      return 0; 
+    }
+  });
+
+  // Pagination
+  const indexOfLastForm = currentPage * rowsPerPage;
+  const indexOfFirstForm = indexOfLastForm - rowsPerPage;
+  const currentForms = sortedForms.slice(indexOfFirstForm, indexOfLastForm);
+
+
+
+// Function to delete a form submission
   const handleDeleteSubmission = async (submissionId) => {
     try {
       await axios.delete(`/user/delete-form/${submissionId}`, {
@@ -42,7 +109,6 @@ const UserDashboard = () => {
       console.error('Error deleting form submission:', error);
     }
   };
-
 
   // Function to export data to Excel
   const handleExportExcel = () => {
@@ -106,7 +172,6 @@ const UserDashboard = () => {
 
       for (let i = dataStartRow; i < data.length; i++) {
         const rowData = data[i];
-        console.log('rowData:', rowData);
         // Create formData object with your specific field names and order
         const formData = {
           date: convertDate(rowData[0]),
@@ -131,10 +196,10 @@ const UserDashboard = () => {
           necessityModifierSMQ: rowData[19] || '',
         };
 
-        console.log('formData:', formData);
-
         // Send data to the backend
         await axios.post('/user/submit-form', {
+          numId: i - dataStartRow + 1,
+          adminId : user.adminId,
           userId: user._id,
           formData,
         }, {
@@ -142,13 +207,21 @@ const UserDashboard = () => {
         });
       }
 
-      // ... (Re-fetch forms to update the UI)
+      // Refresh the form submissions
+      const response = await axios.get('/user/forms', {
+        headers: Auth.authHeader(),
+        params: { userId: user._id },
+      });
+      setForms(response.data);
+
 
     } catch (error) {
       console.error('Error importing Excel data:', error);
       setImportError('An error occurred during import: ' + error.message); 
     }
   };
+
+
   const convertDate = (excelDateValue) => {
     if (excelDateValue) {
       // Handle Excel numerical date format
@@ -209,70 +282,175 @@ const UserDashboard = () => {
       </div>
 
       <div className="bg-white rounded-lg shadow-md p-6 mb-6">
-        <h2 className="text-xl font-bold mb-2">Submit a New Form</h2>
-        <Link to="/user/forms" className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
-          Go to Forms
-        </Link>
-      </div>
-
-      <div className="bg-white rounded-lg shadow-md p-6 mb-6">
         <h2 className="text-xl font-bold mb-2">Your Form Submissions</h2>
+        {/* Display button add new form icon */}
+        <div className="flex items-center mb-4 justify-end">
+        <Link to="/user/forms" className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+          New Form
+        </Link>
+        </div>
+
+
+        {/* Display a search Icon */}
+
+        <div className="flex items-center mb-4">
+          <input
+            type="text"
+            placeholder="Search..."
+            className="border border-gray-300 p-2 w-full"
+            value={searchTerm}
+            onChange={handleSearchChange} 
+          />
+          <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded ml-2">
+            <FontAwesomeIcon icon={faSearch} />
+          </button>
+        </div>
+
+        {/* Display filters   */}
+        <div className="flex col items-center mb-4">
+          <label>Filter:</label>
+          <select className="m-2 border border-gray-300 p-2 w-1/3"  onChange={handleFilterChange}>
+            <option value="">No.</option>
+            
+            <option value="date">Date</option>
+            <option value="source">Source</option>
+            <option value="process">Processus</option>
+            <option value="site">Site</option>
+            <option value="typeAction">Type d'action</option>
+            <option value="etatAction">Etat de la fiche Action</option>
+          </select>
+          <label className="m-2">Sort:</label>
+          <select className="border border-gray-300 p-2 w-1/3 ml-2"  onChange={handleSortChange}>
+            <option value="">None</option>
+            <option value="asc">Ascending</option>
+            <option value="desc">Descending</option>
+          </select>
+          <label className="m-2">Rows:</label>
+          <select className="border border-gray-300 p-2 w-1/3 ml-2"  onChange={handleRowsPerPageChange}>
+            <option value="1">1</option>
+            <option value="5" selected>5</option>
+            <option value="10">10</option>
+            <option value="25">25</option>
+            <option value="50">50</option>
+            <option value="100">100</option>
+          </select>
+          
+        </div>
+
         {/* Display Import Error (if any) */}
         {importError && <div className="text-red-500 mb-4">{importError}</div>}
 
-        {forms.length === 0 ? (
-          <p>No form submissions yet.</p>
+        {currentForms.length === 0 ? (
+          <p>No form submissions found.</p>
         ) : (
-          <table className="table-auto w-full h-auto mb-4 ">
-            <thead>
-              <tr>
-                <th className="px-4 py-2 text-left">Date</th>
-                <th className="px-4 py-2 text-left">Source</th>
-                <th className="px-4 py-2 text-left">Processus</th>
-                {/* Add other table headers as needed based on your form data */}
-                <th className="px-4 py-2">Actions</th>
-              </tr>
-            </thead>
-            {/* 
+          <div className="overflow-x-auto"> 
+            <table className="table-auto w-full text-center h-96 overflow-y-scroll">
+              <thead>
+                <tr>
+                  <th className="px-4 py-2 text-center" style={{'background-color':'#f7cbac'}}>No.</th>
+                  <th className="px-4 py-2 text-center bg-orange" style={{'background-color':'#f7cbac'}} >Date</th>
+                  <th className="px-4 py-2 text-center" style={{'background-color':'#f7cbac'}}>Source</th>
+                  <th className="px-4 py-2 text-center" style={{'background-color':'#f7cbac'}}>Processus</th>
+                  <th className="px-4 py-2 text-center" style={{'background-color':'#f7cbac'}}>Site</th>
+                  <th className="px-4 py-2 text-center" style={{'background-color':'#f7cbac'}}>Constat</th>
+                  <th className="px-4 py-2 text-center" style={{'background-color':'#f7cbac'}}>Type d'action</th>
+                  <th className="px-4 py-2 text-center" style={{'background-color':'#f7cbac'}}>Risque</th>
 
-    make table display scrollable
+                  <th className="px-4 py-2 text-center" style={{'background-color':'#bdd7ee'}}>Responsable Traitement</th>
+                  <th className="px-4 py-2 text-center" style={{'background-color':'#bdd7ee'}}>Analyses Causes</th>
+                  <th className="px-4 py-2 text-center" style={{'background-color':'#bdd7ee'}}>Libellé Action</th>
+                  <th className="px-4 py-2 text-center" style={{'background-color':'#bdd7ee'}}>Date Prévue Réalisation</th>
+                  <th className="px-4 py-2 text-center" style={{'background-color':'#bdd7ee'}}>Date Vérification Efficacité</th>
+                  <th className="px-4 py-2 text-center" style={{'background-color':'#bdd7ee'}}>Critères Vérification Efficacité</th>
+                  
+                  <th className="px-4 py-2 text-center" style={{'background-color':'#a8d08d'}}>Vérification Efficacité</th>
+                  <th className="px-4 py-2 text-center" style={{'background-color':'#a8d08d'}}>Etat Action</th>
+                  <th className="px-4 py-2 text-center" style={{'background-color':'#a8d08d'}}>Date Clôture Action</th>
+                  <th className="px-4 py-2 text-center" style={{'background-color':'#a8d08d'}}>Plan Action</th>
+                  <th className="px-4 py-2 text-center" style={{'background-color':'#a8d08d'}}>DOC Enregistrement</th>
+                  <th className="px-4 py-2 text-center" style={{'background-color':'#a8d08d'}}>Necessity Maj RO</th>
+                  <th className="px-4 py-2 text-center" style={{'background-color':'#a8d08d'}}>Necessity Modifier SMQ</th>
+                  <th className="text-white px-4 py-2" style={{'background-color':'#ef4444'}} >Actions</th>
+                </tr>
+              </thead>
+              <tbody className="text-sm overflow-y-scroll">
+                {currentForms.map((form) => (
 
-    <tbody className="text-sm max-h-96 overflow-y-scroll">
-            
-            */ }
-            <tbody className="text-sm h-96 overflow-y-scroll scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100">
-              {forms.map((form) => (
-                <tr key={form._id}>
-                  <td className="border px-4 py-2">
-                    {new Date(form.formData.date).toLocaleDateString()}
-                  </td>
-                  <td className="border px-4 py-2">{form.formData.source}</td>
-                  <td className="border px-4 py-2">{form.formData.process}</td>
-                  {/* Add other table cells as needed based on your form data */}
-                  <td className="border px-4 py-2">
-                    <div className="flex justify-end space-x-2">
-                      <Link
-                        to={`/user/forms/${form._id}`}
-                        className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-1 px-2 rounded text-xs"
-                      >
-                        Edit
-                      </Link>
+
+                  <tr key={form._id}>
+                    <td className="border px-4 py-2">{form.numId}</td>
+                    <td className="border px-4 py-2" >{form.formData.date}</td>
+                    <td className="border px-4 py-2">{form.formData.source}</td>
+                    <td className="border px-4 py-2">{form.formData.process}</td>
+                    <td className="border px-4 py-2">{form.formData.site}</td>
+                    <td className="border px-4 py-2">{form.formData.constat}</td>
+                    <td className="border px-4 py-2">{form.formData.typeAction}</td>
+                    <td className="border px-4 py-2">{form.formData.risque}</td>
+                    <td className="border px-4 py-2">{form.formData.responsableTraitement}</td>
+                    <td className="border px-4 py-2">{form.formData.analysesCauses}</td>
+                    <td className="border px-4 py-2">{form.formData.libelleAction}</td>
+                    <td className="border px-4 py-2">{form.formData.datePrevueRealisation}</td>
+                    <td className="border px-4 py-2">{form.formData.dateVerificationEfficacite}</td>
+                    <td className="border px-4 py-2">{form.formData.criteresVerificationEfficacite}</td>
+                    <td className="border px-4 py-2">{form.formData.verificationEfficacite}</td>
+                    <td className="border px-4 py-2">{form.formData.etatAction}</td>
+                    <td className="border px-4 py-2">{form.formData.dateClotureAction}</td>
+                    <td className="border px-4 py-2">{form.formData.planAction ? 'OUI' : 'NON'}</td>
+                    <td className="border px-4 py-2">{form.formData.docEnregistrement}</td>
+                    <td className="border px-4 py-2">{form.formData.necessityMajRO ? 'OUI' : 'NON'}</td>
+                    <td className="border px-4 py-2">{form.formData.necessityModifierSMQ}</td>
+                    <td className="border  px-4 py-2 text-center whitespace-nowrap px-4 py-2">
                       <button
                         onClick={() => handleDeleteSubmission(form._id)}
-                        className="bg-red-500 hover:bg-red-700 text-white font-bold py-1 px-2 rounded text-xs"
+                        className="bg-red-500 hover:bg-red-700 text-white font-bold py-1 px-2 rounded mr-2"
                       >
                         Delete
                       </button>
-                    </div>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-            
-          </table>
+                      <Link
+                        to={`/user/forms/${form._id}`}
+                        className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-1 px-2 rounded"
+                      >
+                        View
+                      </Link>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div> 
         )}
-          {/* Export/Import Buttons */}
-          <div className="flex justify-end mt-4">
+
+        <div className="mt-4">
+          {/* Pagination Buttons */}
+          <nav aria-label="Page navigation example" className="flex justify-end">
+            <ul className="inline-flex -space-x-px">
+              <li className="page-item xl:mr-2">
+                <button
+                  className="page-link px-3 py-2 rounded-md text-sm font-medium text-gray-500 hover:text-gray-700 focus:z-10 focus:outline-none focus:ring-1 focus:ring-indigo-700 focus:ring-offset-1 focus:ring-offset-gray-100 disabled:opacity-50"
+                  onClick={() => handlePageChange(currentPage - 1)}
+                  disabled={currentPage === 1}
+                >
+                  Previous
+                </button>
+              </li>
+              {/* ... (Pagination Buttons) */}
+              <li className="page-item">
+                <button
+                  className="page-link px-3 py-2 rounded-md text-sm font-medium text-gray-500 hover:text-gray-700 focus:z-10 focus:outline-none focus:ring-1 focus:ring-indigo-700 focus:ring-offset-1 focus:ring-offset-gray-100 disabled:opacity-50"
+                  onClick={() => handlePageChange(currentPage + 1)}
+                  disabled={currentPage === Math.ceil(sortedForms.length / rowsPerPage)}
+                >
+                  Next
+                </button>
+              </li>
+            </ul>
+          </nav>
+        </div>
+        {/* Display Import Error (if any) */}
+        {importError && <div className="text-red-500 mb-4">{importError}</div>}
+
+        {/* Export/Import Buttons */}
+        <div className="flex justify-end mt-4">
           <button
             onClick={handleExportExcel}
             className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded mr-2"

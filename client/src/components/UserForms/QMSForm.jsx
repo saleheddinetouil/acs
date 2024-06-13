@@ -12,6 +12,7 @@ const QMSForm = () => {
 
 
   const [formData, setFormData] = useState({
+    numId: '',
     date: '',
     source: '',
     process: '',
@@ -132,6 +133,7 @@ const QMSForm = () => {
       } else {
         // Submit new form submission
         await axios.post('/user/submit-form', { 
+          adminId : user.adminId,
           userId: user._id,
           formData 
         }, {

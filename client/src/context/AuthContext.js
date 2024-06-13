@@ -20,7 +20,7 @@ const AuthProvider = ({ children }) => {
           const role = decodedToken.userId ? 'user' :
                        decodedToken.adminId ? 'admin' :
                        decodedToken.superAdminId ? 'superadmin' : null;
-
+          
           if (!role) {
             throw new Error('Invalid token payload: Role not found');
           }
