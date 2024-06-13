@@ -89,10 +89,10 @@ router.get('/forms', async (req, res) => {
     try {
         const userId = req.query.userId; 
 
-        const user = await User.findById(userId).populate('formSubmissions');
+        const user = await User.findById(userId).populate('formSubmissions').populate('adminId');
 
         if (!user) {
-            return res.status(404).json({ error: 'Utilisateur non trouvé' });
+            return res.status(404).json({ error: 'Forms non trouvé' });
         }
 
         res.status(200).json(user.formSubmissions);
@@ -110,6 +110,8 @@ router.post('/submit-form', async (req, res) => {
     const formData = req.body.formData;
     // Créer la soumission du formulaire
         const newFormSubmission = new FormSubmission({
+            numId: req.body.numId,
+            adminId: req.body.adminId,
             userId,
             formData,
         });
