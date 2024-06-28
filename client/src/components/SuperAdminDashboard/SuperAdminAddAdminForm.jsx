@@ -11,6 +11,8 @@ const SuperAdminAddAdminForm = () => {
   const [formData, setFormData] = useState({
     firstName: '',
     lastName: '',
+    phone: '',
+    businessName: '',
     email: '',
     password: '',
   });
@@ -82,6 +84,21 @@ const SuperAdminAddAdminForm = () => {
           />
         </div>
         <div className="mb-4 text-left">
+          <label htmlFor="phone" className="block text-gray-700 font-bold mb-2">Phone:</label>
+          <input
+            type="text"
+            id="phone"
+            name="phone"
+            value={formData.phone}
+            onChange={handleChange}
+            className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+            required
+          />
+        </div>
+
+        
+
+        <div className="mb-4 text-left">
             <label htmlFor="email" className="block text-gray-700 font-bold mb-2">Email:</label>
             <input
                 type="email"
@@ -107,6 +124,9 @@ const SuperAdminAddAdminForm = () => {
                 required
             />
         </div>
+       
+
+
         
 
         <button 
@@ -115,6 +135,15 @@ const SuperAdminAddAdminForm = () => {
         >
           Create Admin
         </button>
+
+        <button 
+          onClick={() => navigate('/superadmin')}
+          className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline ml-4"
+        >
+          Cancel
+        </button>
+        
+
       </form>
     </div>
     </>

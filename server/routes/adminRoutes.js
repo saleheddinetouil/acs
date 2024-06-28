@@ -166,26 +166,6 @@ router.delete('/users/:userId', auth, async (req, res) => {
     }
 });
 
-// Route pour marquer un admin comme payé
-router.put('/mark-paid/:adminId', auth, async (req, res) => {
-    try {
-        const adminId = req.params.adminId;
-
-        // Trouver et mettre à jour l'admin
-        const admin = await Admin.findByIdAndUpdate(adminId, { isPaid: true }, { new: true });
-
-        if (!admin) {
-            return res.status(404).json({ error: 'Admin non trouvé' });
-        }
-
-        res.status(200).json(admin);
-
-    } catch (err) {
-        console.error('Erreur lors de la mise à jour de l\'admin:', err);
-        res.status(500).json({ error: 'Erreur lors de la mise à jour de l\'admin' });
-    }
-});
-
 // Route pour mettre à jour le type de paiement d'un admin
 router.put('/update-payment/:adminId', auth, async (req, res) => {
     try {
@@ -206,21 +186,15 @@ router.put('/update-payment/:adminId', auth, async (req, res) => {
         res.status(500).json({ error: 'Erreur lors de la mise à jour de l\'admin' });
     }
 });
+
 // Route to simulate card payment processing 
 router.post('/process-card-payment', auth, async (req, res) => {
     try {
-      const { cardNumber, expiryMonth, expiryYear, cvv } = req.body;
+      const { cardNumber, expiryMonth, expiryYear, cvv } = req.body.cardDetails;
   
       // Simulated processing delay (replace with actual payment gateway logic)
       await new Promise(resolve => setTimeout(resolve, 2000)); // Wait 2 seconds
   
-      // Replace this with your actual payment gateway integration!
-      console.log('Processing card payment:', {
-        cardNumber,
-        expiryMonth,
-        expiryYear,
-        cvv
-      });
   
       // Simulate a successful payment (replace with your payment gateway's response)
       const paymentSuccessful = true; 

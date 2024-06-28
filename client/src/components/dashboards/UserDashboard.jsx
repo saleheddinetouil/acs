@@ -23,10 +23,12 @@ const UserDashboard = () => {
 
     const fetchForms = async () => {
       try {
-        const response = await axios.get('/user/forms', {
+        const response = await axios.post('/user/forms',
+          { adminId: user.adminId, userId: user._id }
+        , {
           headers: Auth.authHeader(),
-          params: { userId: user._id },
         });
+
         setForms(response.data);
       } catch (error) {
         console.error('Error fetching forms:', error);
@@ -70,7 +72,13 @@ const UserDashboard = () => {
   const filteredForms = forms.filter((form) => {
     // Search filter
     if (searchTerm) {
-      const searchTermLower = searchTerm.toLowerCase() || '';
+      if (!filterColumn) {
+        return Object.values(form.formData).some((value) =>
+          value.toString().toLowerCase().includes(searchTerm.toLowerCase())
+        );
+      }
+      const searchTermLower = searchTerm.toLowerCase() || searchTerm.toString().toLowerCase();
+
       const formValue = form.formData[filterColumn].toLowerCase();
       return formValue.includes(searchTermLower);
     }
@@ -198,7 +206,6 @@ const UserDashboard = () => {
 
         // Send data to the backend
         await axios.post('/user/submit-form', {
-          numId: i - dataStartRow + 1,
           adminId : user.adminId,
           userId: user._id,
           formData,
@@ -208,9 +215,11 @@ const UserDashboard = () => {
       }
 
       // Refresh the form submissions
-      const response = await axios.get('/user/forms', {
+      const response = await axios.post('/user/forms', {
+        adminId: user.adminId,
+        userId: user._id,
+      } ,{
         headers: Auth.authHeader(),
-        params: { userId: user._id },
       });
       setForms(response.data);
 
@@ -272,6 +281,7 @@ const UserDashboard = () => {
         <p><strong>Name:</strong> {user.firstName} {user.lastName}</p>
         <p><strong>Email:</strong> {user.email}</p>
         <p><strong>Phone:</strong> {user.phone}</p>
+        <p><strong>Business Name:</strong> {user.businessName}</p>
         
         <p><strong>Forms Submitted:</strong> {forms.length}</p>
 
@@ -279,10 +289,27 @@ const UserDashboard = () => {
         <Link to="/profile" className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mt-4 inline-block">
           Edit Profile
         </Link>
+        {/* TODO add stats button admin user */}
+        <Link to="/stats" className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mt-4 inline-block ml-2">
+        Stats
+        </Link>
       </div>
+      {/* indicators :
+      Nombre Total d’actions
+Nombre d’actions en cours
+Nombre d’actions clôturées.
+      */}
+      {forms.length === 0 && (
+        <div className="bg-white rounded-lg shadow-md p-6 mb-6">
+        <h2 className="text-xl font-bold mb-2">Indicators</h2>
+        <p><strong>Total Actions:</strong> {forms.length}</p>
+        <p><strong>Actions in Progress:</strong> {forms.filter(form => form.formData.etatAction === 'EN COURS').length}</p>
+        <p><strong>Closed Actions:</strong> {forms.filter(form => form.formData.etatAction === 'CLOTUREE').length}</p>
+      </div>
+      )}
 
       <div className="bg-white rounded-lg shadow-md p-6 mb-6">
-        <h2 className="text-xl font-bold mb-2">Your Form Submissions</h2>
+        <h2 className="text-xl font-bold mb-2">All Form Submissions</h2>
         {/* Display button add new form icon */}
         <div className="flex items-center mb-4 justify-end">
         <Link to="/user/forms" className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
@@ -343,7 +370,7 @@ const UserDashboard = () => {
         {currentForms.length === 0 ? (
           <p>No form submissions found.</p>
         ) : (
-          <div className="overflow-x-auto"> 
+          <div className="overflow-x-auto overflow-y-scroll"> 
             <table className="table-auto w-full text-center h-96 overflow-y-scroll">
               <thead>
                 <tr>
@@ -373,7 +400,7 @@ const UserDashboard = () => {
                   <th className="text-white px-4 py-2" style={{'background-color':'#ef4444'}} >Actions</th>
                 </tr>
               </thead>
-              <tbody className="text-sm overflow-y-scroll">
+              <tbody className="text-sm ">
                 {currentForms.map((form) => (
 
 
@@ -419,7 +446,7 @@ const UserDashboard = () => {
             </table>
           </div> 
         )}
-
+        {forms.length && (
         <div className="mt-4">
           {/* Pagination Buttons */}
           <nav aria-label="Page navigation example" className="flex justify-end">
@@ -446,6 +473,7 @@ const UserDashboard = () => {
             </ul>
           </nav>
         </div>
+      )}
         {/* Display Import Error (if any) */}
         {importError && <div className="text-red-500 mb-4">{importError}</div>}
 

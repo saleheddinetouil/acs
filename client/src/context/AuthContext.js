@@ -20,6 +20,7 @@ const AuthProvider = ({ children }) => {
           const role = decodedToken.userId ? 'user' :
                        decodedToken.adminId ? 'admin' :
                        decodedToken.superAdminId ? 'superadmin' : null;
+
           
           if (!role) {
             throw new Error('Invalid token payload: Role not found');
@@ -29,7 +30,7 @@ const AuthProvider = ({ children }) => {
             headers: { Authorization: `Bearer ${token}` },
           });
 
-          setUser({ ...response.data, role });
+          setUser({ ...response.data, role});
 
         } catch (error) {
           console.error('Token verification failed:', error);

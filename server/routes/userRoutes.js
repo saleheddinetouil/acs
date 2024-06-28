@@ -26,37 +26,6 @@ router.get('/', async (req, res) => {
 });
 
 
-
-// Route pour l'inscription des utilisateurs
-router.post('/register', async (req, res) => {
-    try {
-        // Hash du mot de passe
-        const salt = await bcrypt.genSalt(10);
-        const hashedPassword = await bcrypt.hash(req.body.password, salt);
-
-        // Création du nouvel utilisateur
-        const newUser = new User({
-            firstName: req.body.firstName,
-            lastName: req.body.lastName,
-            email: req.body.email,
-            password: hashedPassword,
-            adminId: req.body.adminId, // AdminId pour associer à l'admin
-        });
-
-        // Enregistrement du nouvel utilisateur
-        const user = await newUser.save();
-
-        // Générer le token JWT
-        const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET);
-
-        res.status(201).json({ token, userId: user._id });
-
-    } catch (err) {
-        console.error("Erreur lors de l'inscription:", err);
-        res.status(500).json({ error: 'Erreur lors de linscription' });
-    }
-});
-
 // Route pour la connexion des utilisateurs
 router.post('/login', async (req, res) => {
     try {
@@ -85,17 +54,16 @@ router.post('/login', async (req, res) => {
 });
 
 // Route pour obtenir les soumissions de formulaire d'un utilisateur
-router.get('/forms', async (req, res) => {
+router.post('/forms', async (req, res) => {
     try {
-        const userId = req.query.userId; 
+        const adminId = req.body.adminId;
 
-        const user = await User.findById(userId).populate('formSubmissions').populate('adminId');
+        // Trouver les soumissions de formulaire de l'utilisateur
+        const formSubmissions = await FormSubmission.find({  adminId: adminId });
 
-        if (!user) {
-            return res.status(404).json({ error: 'Forms non trouvé' });
-        }
+        res.status(200).json(formSubmissions);
 
-        res.status(200).json(user.formSubmissions);
+
 
     } catch (err) {
         console.error('Erreur lors de la récupération des soumissions:', err);
@@ -107,21 +75,19 @@ router.get('/forms', async (req, res) => {
 router.post('/submit-form', async (req, res) => {
     try {
     const userId = req.body.userId;
+    const adminId = req.body.adminId;
     const formData = req.body.formData;
     // Créer la soumission du formulaire
         const newFormSubmission = new FormSubmission({
-            numId: req.body.numId,
-            adminId: req.body.adminId,
-            userId,
+            adminId: adminId,
+            userId: userId,
+            lastEditedBy: userId,
             formData,
         });
     
         // Enregistrer la soumission
         const formSubmission = await newFormSubmission.save();
-    
-        // Ajouter la soumission à l'utilisateur
-        const user = await User.findByIdAndUpdate(userId, { $push: { formSubmissions: formSubmission._id } }, { new: true });
-    
+
         res.status(201).json(formSubmission);
     
     } catch (err) {
@@ -172,7 +138,6 @@ router.delete('/delete-form/:formSubmissionId', async (req, res) => {
         res.status(500).json({ error: 'Erreur lors de la suppression du formulaire' });
     }
 });
-
 // get /forms:id 
 router.get('/forms/:formId', async (req, res) => {
     try {
@@ -192,6 +157,7 @@ router.get('/forms/:formId', async (req, res) => {
     }
 });
 
+// TODO
 // Route effacer un form 
 router.delete('/forms/:formId', async (req,res) => {
     try {

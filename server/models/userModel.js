@@ -8,6 +8,7 @@ const userSchema = new mongoose.Schema({
     password: { type: String, required: true },
     role: { type: String, enum: ['user', 'admin'], default: 'user' },
     adminId: { type: mongoose.Schema.Types.ObjectId, ref: 'Admin' }, 
+    businessName: { type: String , ref: 'Admin' },
     formSubmissions: [{ type: mongoose.Schema.Types.ObjectId, ref: 'FormSubmission' }] 
 });
 

@@ -9,10 +9,9 @@ const QMSForm = () => {
   const { user } = useContext(AuthContext);
   const { formSubmissionId } = useParams();
   const navigate = useNavigate();
-
+  const [activeTab, setActiveTab] = useState('ecart');
 
   const [formData, setFormData] = useState({
-    numId: '',
     date: '',
     source: '',
     process: '',
@@ -45,7 +44,9 @@ const QMSForm = () => {
           setIsLoading(true);
           const response = await axios.get(
             `/user/forms/${formSubmissionId}`,
+            
             {
+
               headers: Auth.authHeader(),
             }
           );
@@ -66,7 +67,7 @@ const QMSForm = () => {
         const year = today.getFullYear();
         setFormData((prevData) => ({
           ...prevData,
-          date: `${day}-${month}-${year}`,
+          date: `${day}/${month}/${year}`,
         }));
       }
     };
@@ -176,9 +177,30 @@ const QMSForm = () => {
         <h1 className="text-3xl font-bold mb-4">
           {formSubmissionId ? 'Edit QMS Form' : 'New QMS Form'}
         </h1>
+          {/* Tab Navigation */}
+          <div className="flex border-b border-gray-200 mb-6 justify-center">
+          <button 
+            onClick={() => setActiveTab('ecart')}
+            className={`py-2 px-4 font-medium text-gray-700 ${activeTab === 'user' ? 'border-b-2 border-blue-500' : ''}`}
+          >
+            Écarts
+          </button>
+          <button 
+            onClick={() => setActiveTab('critere')}
+            className={`py-2 px-4 font-medium text-gray-700 ${activeTab === 'admin' ? 'border-b-2 border-blue-500' : ''}`}
+          >
+            Critères d’évaluations
+          </button>
+          <button 
+            onClick={() => setActiveTab('efficacite')}
+            className={`py-2 px-4 font-medium text-gray-700 ${activeTab === 'superadmin' ? 'border-b-2 border-blue-500' : ''}`}
+          >
+            Efficacité des actions
+          </button>
+        </div>
         {error && <div className="text-red-500 mb-4 text-left">{error}</div>}
         {isLoading && <div>Loading...</div>}
-        {!isLoading && (
+        {!isLoading && activeTab === 'ecart' && (
           <form onSubmit={handleSubmit} className="bg-white rounded-lg shadow-md p-6">
             {/* Date */}
             <div className="mb-4 text-left">
@@ -344,7 +366,27 @@ const QMSForm = () => {
               </select>
             </div>
 
-            {/* Responsable Traitement (Text Input) */}
+            <button
+              type="submit"
+              className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
+              disabled={isLoading}
+            >
+              {formSubmissionId ? 'Save Changes' : 'Submit Form'}
+            </button>
+            <button
+              type="button"
+              onClick={() => navigate('/user')}
+              className="ml-4 bg-gray-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
+            >
+              Cancel
+            </button>
+
+          </form>
+        )}
+        {!isLoading && activeTab === 'critere' && (
+
+          <form onSubmit={handleSubmit} className="bg-white rounded-lg shadow-md p-6">
+            
             <div className="mb-4 text-left">
               <label
                 htmlFor="responsableTraitement"
@@ -457,26 +499,27 @@ const QMSForm = () => {
                 
               />
             </div>
-
-            {/* Verification de l'Efficacité (Text Input) */}
-            <div className="mb-4 text-left">
-              <label
-                htmlFor="verificationEfficacite"
-                className="block text-gray-700 font-bold mb-2"
-              >
-                Vérification de l'Efficacité:
-              </label>
-              <input
-                type="text"
-                id="verificationEfficacite"
-                name="verificationEfficacite"
-                value={formData.verificationEfficacite}
-                onChange={handleChange}
-                className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                
-              />
-            </div>
-
+            <button 
+              type="submit"
+              className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
+              disabled={isLoading}
+            >
+              {formSubmissionId ? 'Save Changes' : 'Submit Form'}
+            </button>
+            <button 
+              type="button"
+              onClick={() => navigate('/user')}
+              className="ml-4 bg-gray-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
+            >
+              Cancel
+            </button>
+            
+            </form>
+        
+        )}
+        {!isLoading && activeTab === 'efficacite' && (
+          <form onSubmit={handleSubmit} className="bg-white rounded-lg shadow-md p-6">
+            
             {/* Etat de l'Action (Dropdown) */}
             <div className="mb-4 text-left">
               <label
@@ -606,15 +649,14 @@ const QMSForm = () => {
                 
               />
             </div>
-
-            <button
+            <button 
               type="submit"
               className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
               disabled={isLoading}
             >
               {formSubmissionId ? 'Save Changes' : 'Submit Form'}
             </button>
-            <button
+            <button 
               type="button"
               onClick={() => navigate('/user')}
               className="ml-4 bg-gray-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
@@ -622,8 +664,10 @@ const QMSForm = () => {
               Cancel
             </button>
 
-          </form>
-        )}
+            </form>
+
+
+          )}
       </div>
     </>
   );

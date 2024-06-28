@@ -89,8 +89,10 @@ router.post('/admins/add', auth, async (req, res) => {
             firstName: req.body.firstName,
             lastName: req.body.lastName,
             businessName: req.body.businessName,
+            phone: req.body.phone,
             email: req.body.email,
             password: hashedPassword,
+            isPaid: req.body.isPaid,
 
         });
 

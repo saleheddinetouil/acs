@@ -32,6 +32,8 @@ const seed = async () => {
         const admin = new Admin({
             firstName: 'Admin',
             lastName: 'Admin',
+            phone: '12345678',
+            businessName: 'Business',
             email: 'admin@business.tn',
             password: await bcrypt.hash('admin', 10)
         });
@@ -41,9 +43,11 @@ const seed = async () => {
         const user = new User({
             firstName: 'User',
             lastName: 'User',
+            phone: '12345678',
             email: 'user@business.tn',
             password: await bcrypt.hash('user', 10),
-            adminId: admin._id
+            adminId: admin._id,
+            businessName: admin.businessName
         });
         await user.save();
 
