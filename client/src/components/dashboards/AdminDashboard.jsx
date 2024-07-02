@@ -157,32 +157,3 @@ const AdminDashboard = () => {
 };
 
 export default AdminDashboard;
-/*
-
-TODO
-
-ADMIN SEES THE FORMS SUBMITTED BY USERS ( mention users ) - ok
-
-DELETE ALL FORMS 
-
-ACS --> LOGO ACS - ok
-
-LOGOUT MELLOUTA REMOVE - ok 
-
-SIGNUP DOESNT HAVE AUTHCONTEXT - ok
-
-LOGIN APGE LESS WIDTH remove super admin user - ok
-
-users and nafss ladmin  andhom nafss l form - ok
-
-superadmin condition noumrou 
-
-conditionnement ala noumrou tel - ok
-
-kol admin 9adech andou men user - ok 
-
-profile feha profile details o logout
-
-admin maandouch view stats button
-
-*/
