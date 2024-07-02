@@ -157,7 +157,6 @@ router.get('/forms/:formId', async (req, res) => {
     }
 });
 
-// TODO
 // Route effacer un form 
 router.delete('/forms/:formId', async (req,res) => {
     try {
