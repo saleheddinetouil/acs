@@ -12,6 +12,7 @@ const SuperAdminProfileEdit = () => {
   const [formData, setFormData] = useState({
     firstName: '',
     lastName: '',
+    phone: '',
     email: '',
     password: '', 
 
@@ -27,6 +28,7 @@ const SuperAdminProfileEdit = () => {
         setFormData({
             superAdminId: user._id,
             firstName: user.firstName,
+            phone: user.phone,
             lastName: user.lastName,
             email: user.email,
         });

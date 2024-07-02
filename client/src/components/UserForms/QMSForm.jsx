@@ -141,7 +141,7 @@ const QMSForm = () => {
           headers: Auth.authHeader(),
         });
       }
-      navigate('/user'); // Redirect to user dashboard after submission
+      navigate('/'+Auth.getRole()); // Redirect to user dashboard after submission
     } catch (error) {
       console.error('Error submitting form:', error);
       setError('Error submitting form. Please try again.');
@@ -173,27 +173,27 @@ const QMSForm = () => {
   return (
     <>
       <Navbar />
-      <div className="container mx-auto px-4 py-8">
+      <div className="container mx-auto px-4 py-8 w-96">
         <h1 className="text-3xl font-bold mb-4">
-          {formSubmissionId ? 'Edit QMS Form' : 'New QMS Form'}
+          {formSubmissionId ? 'Edit/View QMS Form' : 'New QMS Form'}
         </h1>
           {/* Tab Navigation */}
           <div className="flex border-b border-gray-200 mb-6 justify-center">
           <button 
             onClick={() => setActiveTab('ecart')}
-            className={`py-2 px-4 font-medium text-gray-700 ${activeTab === 'user' ? 'border-b-2 border-blue-500' : ''}`}
+            className={`py-2 px-4 font-medium text-gray-700 ${activeTab === 'ecart' ? 'border-b-2 border-blue-500' : ''}`}
           >
             Écarts
           </button>
           <button 
             onClick={() => setActiveTab('critere')}
-            className={`py-2 px-4 font-medium text-gray-700 ${activeTab === 'admin' ? 'border-b-2 border-blue-500' : ''}`}
+            className={`py-2 px-4 font-medium text-gray-700 ${activeTab === 'critere' ? 'border-b-2 border-blue-500' : ''}`}
           >
             Critères d’évaluations
           </button>
           <button 
             onClick={() => setActiveTab('efficacite')}
-            className={`py-2 px-4 font-medium text-gray-700 ${activeTab === 'superadmin' ? 'border-b-2 border-blue-500' : ''}`}
+            className={`py-2 px-4 font-medium text-gray-700 ${activeTab === 'efficacite' ? 'border-b-2 border-blue-500' : ''}`}
           >
             Efficacité des actions
           </button>
@@ -211,6 +211,7 @@ const QMSForm = () => {
                 Date:
               </label>
               <input
+                disabled={Auth.getRole() !== 'user'}  
                 type="date"
                 
                 id="date"
@@ -231,6 +232,7 @@ const QMSForm = () => {
                 Source:
               </label>
               <select
+                disabled={Auth.getRole() !== 'user'}  
                 id="source"
                 name="source"
                 value={formData.source}
@@ -256,6 +258,7 @@ const QMSForm = () => {
                 Processus:
               </label>
               <select
+                disabled={Auth.getRole() !== 'user'}  
                 id="process"
                 name="process"
                 value={formData.process}
@@ -281,9 +284,10 @@ const QMSForm = () => {
                 Site:
               </label>
               <select
+                disabled={Auth.getRole() !== 'user'}  
                 id="site"
                 name="site"
-                value={formData.site.toLocaleLowerCase()}
+                value={formData.site}
                 onChange={handleChange}
                 className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
                 
@@ -306,6 +310,8 @@ const QMSForm = () => {
                 Constat:
               </label>
               <input
+                disabled={Auth.getRole() !== 'user'}  
+
                 type="text"
                 id="constat"
                 name="constat"
@@ -325,6 +331,7 @@ const QMSForm = () => {
                 Type d'Action:
               </label>
               <select
+                disabled={Auth.getRole() !== 'user'}  
                 id="typeAction"
                 name="typeAction"
                 value={formData.typeAction}
@@ -350,6 +357,7 @@ const QMSForm = () => {
                 Risque:
               </label>
               <select
+                disabled={Auth.getRole() !== 'user'}  
                 id="risque"
                 name="risque"
                 value={formData.risque.toLocaleLowerCase()}
@@ -369,13 +377,13 @@ const QMSForm = () => {
             <button
               type="submit"
               className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
-              disabled={isLoading}
+              disabled={Auth.getRole() !== 'user'}  
             >
               {formSubmissionId ? 'Save Changes' : 'Submit Form'}
             </button>
             <button
               type="button"
-              onClick={() => navigate('/user')}
+              onClick={() => navigate('/'+Auth.getRole())}
               className="ml-4 bg-gray-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
             >
               Cancel
@@ -395,6 +403,7 @@ const QMSForm = () => {
                 Responsable de Traitement:
               </label>
               <input
+                disabled={Auth.getRole() !== 'user'}  
                 type="text"
                 id="responsableTraitement"
                 name="responsableTraitement"
@@ -414,6 +423,7 @@ const QMSForm = () => {
                 Analyse des Causes:
               </label>
               <input
+                disabled={Auth.getRole() !== 'user'}  
                 type="text"
                 id="analysesCauses"
                 name="analysesCauses"
@@ -433,6 +443,7 @@ const QMSForm = () => {
                 Libellé de l'Action:
               </label>
               <input
+                disabled={Auth.getRole() !== 'user'}  
                 type="text"
                 id="libelleAction"
                 name="libelleAction"
@@ -452,6 +463,7 @@ const QMSForm = () => {
                 Date prévue de réalisation:
               </label>
               <input
+                disabled={Auth.getRole() !== 'user'}  
                 type="date"
                 id="datePrevueRealisation"
                 name="datePrevueRealisation"
@@ -471,6 +483,7 @@ const QMSForm = () => {
                 Date de vérification de l'efficacité:
               </label>
               <input
+                disabled={Auth.getRole() !== 'user'}  
                 type="date"
                 id="dateVerificationEfficacite"
                 name="dateVerificationEfficacite"
@@ -490,6 +503,7 @@ const QMSForm = () => {
                 Critères de vérification de l'efficacité:
               </label>
               <input
+                disabled={Auth.getRole() !== 'user'}  
                 type="text"
                 id="criteresVerificationEfficacite"
                 name="criteresVerificationEfficacite"
@@ -508,7 +522,7 @@ const QMSForm = () => {
             </button>
             <button 
               type="button"
-              onClick={() => navigate('/user')}
+              onClick={() => navigate('/'+Auth.getRole())}
               className="ml-4 bg-gray-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
             >
               Cancel
@@ -529,6 +543,7 @@ const QMSForm = () => {
                 État de l'Action:
               </label>
               <select
+                disabled={Auth.getRole() !== 'user'}  
                 id="etatAction"
                 name="etatAction"
                 value={formData.etatAction}
@@ -554,6 +569,7 @@ const QMSForm = () => {
                 Date de Clôture de l'Action:
               </label>
               <input
+                disabled={Auth.getRole() !== 'user'}  
                 type="date"
                 id="dateClotureAction"
                 name="dateClotureAction"
@@ -573,6 +589,7 @@ const QMSForm = () => {
                 Plan d'Action:
               </label>
               <select
+                disabled={Auth.getRole() !== 'user'}  
                 id="planAction"
                 name="planAction"
                 value={formData.planAction}
@@ -597,6 +614,7 @@ const QMSForm = () => {
                 Documents d'Enregistrement:
               </label>
               <input
+                disabled={Auth.getRole() !== 'user'}  
                 type="text"
                 id="docEnregistrement"
                 name="docEnregistrement"
@@ -616,6 +634,7 @@ const QMSForm = () => {
                 Nécessité de mise à jour des R/O:
               </label>
               <select
+                disabled={Auth.getRole() !== 'user'}  
                 id="necessityMajRO"
                 name="necessityMajRO"
                 value={formData.necessityMajRO}
@@ -640,6 +659,7 @@ const QMSForm = () => {
                 Nécessité de modifier le SMQ:
               </label>
               <input
+                disabled={Auth.getRole() !== 'user'}  
                 type="text"
                 id="necessityModifierSMQ"
                 name="necessityModifierSMQ"
@@ -658,7 +678,7 @@ const QMSForm = () => {
             </button>
             <button 
               type="button"
-              onClick={() => navigate('/user')}
+              onClick={() => navigate('/'+Auth.getRole())}
               className="ml-4 bg-gray-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
             >
               Cancel

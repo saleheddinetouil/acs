@@ -4,6 +4,7 @@ const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const Admin = require('../models/adminModel');
 const User = require('../models/userModel'); 
+const Form = require('../models/formSubmissionModel');
 const auth = require('../middleware/auth');
 const nodemailer = require('nodemailer');
 
@@ -15,6 +16,30 @@ const transporter = nodemailer.createTransport({
       pass: process.env.SMTP_PASS // Your email password (use app password for Gmail)
     }
   });
+
+// Route pour obtenir tous les forms soumis par les utilisateurs d'un admin
+router.post('/forms', async (req, res) => {
+    try {
+        const adminId = req.body.adminId;
+
+        // Trouver les utilisateurs de l'admin
+        const users = await User.find({ adminId: adminId });
+
+        // Extraire les IDs des utilisateurs
+        const userIds = users.map(user => user._id);
+
+        // Trouver les forms soumis par les utilisateurs
+        const forms = await Form.find({ userId: { $in: userIds } });
+
+        res.status(200).json(forms);
+    } catch (err) {
+        console.error('Erreur lors de la récupération des forms:', err);
+        res.status(500).json({ error: 'Erreur lors de la récupération des forms' });
+    }
+});
+
+
+
 
 // Route pour obtenir l'admin actuel
 router.get('/', auth, async (req, res) => {

@@ -6,9 +6,9 @@ import Auth from '../utils/Auth';
 import Navbar from './Navbar';
 
 const ProfileEdit = () => {
-  const { user, logout } = useContext(AuthContext);
+  const { user } = useContext(AuthContext);
   const navigate = useNavigate();
-  const [users,setUser] = useState(null);
+  const [setUser] = useState(null);
   const [formData, setFormData] = useState({
     firstName: '',
     lastName: '',
@@ -44,6 +44,7 @@ const ProfileEdit = () => {
             firstName: user.firstName,
             lastName: user.lastName,
             email: user.email,
+            
         });
     }
     setIsLoading(false);
@@ -60,7 +61,7 @@ const ProfileEdit = () => {
     setError(null); 
 
     try {
-      const response = await axios.put('/user/profile', formData, {
+      const response = await axios.put('/'+user.role+'/profile', formData, {
         headers: Auth.authHeader()
       });
 
@@ -97,7 +98,14 @@ const ProfileEdit = () => {
           {error}
         </div>
       )}
-        
+              <div className="bg-white rounded-lg shadow-md p-6 mb-6">
+        <h2 className="text-left text-xl font-bold mb-2">Information</h2>
+        <p className="text-left"><strong>Name:</strong> {user.firstName} {user.lastName}</p>
+        <p className="text-left"><strong>Email:</strong> {user.email}</p>
+        <p className="text-left"><strong>Phone:</strong> {user.phone}</p>
+            {/* Admin Information */}
+        <p className="text-left"><strong>Business Name:</strong> {user.businessName}</p>
+      </div>
       <form onSubmit={handleSubmit} className="bg-white rounded-lg shadow-md p-6">
         <div className="mb-4">
           <label htmlFor="firstName" className="block text-gray-700 font-bold mb-2 text-left">First Name:</label>
@@ -167,6 +175,14 @@ const ProfileEdit = () => {
         >
           Save Changes
         </button>
+        <button 
+          onClick={() => navigate(-1)}
+          className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline ml-4"
+        >
+          Cancel
+        </button>
+
+
       </form>
     </div>
     </>

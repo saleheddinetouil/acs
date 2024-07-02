@@ -16,14 +16,15 @@ import SuperadminEditAdminForm from './components/SuperAdminDashboard/Superadmin
 import ProfileEdit from './components/ProfileEdit';
 import AdminProfileEdit from './components/AdminProfileEdit';
 import SuperAdminProfileEdit from './components/SuperAdminProfileEdit';
+import Stats from './components/dashboards/Stats';
 import axios from 'axios';
-
-import './App.css';
 
 axios.defaults.baseURL = 'http://localhost:5000';
 
 
 function App() {
+
+
   return (
     <AuthProvider>
       <div className="App">
@@ -33,18 +34,32 @@ function App() {
           <Route path="/login" element={<LoginPage />} />
           <Route path="/signup" element={<SignupPage />} />
 
+
+
           {/* Protected Routes */}
           <Route element={<ProtectedRoute roles={['user']} />}>
             <Route path="/user" element={<UserDashboard />} />
-            <Route path="/profile" element={<ProfileEdit />} />
-            <Route path="/user/forms/:formSubmissionId?" element={<QMSForm />} /> 
+            <Route path="/user/profile" element={<ProfileEdit />} />
+            <Route path="/stats" element={<Stats />} />
+            <Route path="/user/forms/:formSubmissionId?" element={<QMSForm />} />
+
+            {/* Redirect /login & /signup to dashboard if user is already logged in */}
+            <Route path="/login" element={<Navigate to="/user" />} />
+            <Route path="/signup" element={<Navigate to="/user" />} />
+
           </Route>
 
           <Route element={<ProtectedRoute roles={['admin']} />}>
             <Route path="/admin" element={<AdminDashboard />} />
+            <Route path="/admin/stats" element={<Stats />} />
             <Route path="/admin/profile" element={<AdminProfileEdit  />} />
             <Route path="/admin/users/add" element={<AdminAddUserForm />} />
             <Route path="/admin/users/:userId/edit" element={<AdminEditUserForm />} /> 
+            <Route path="/admin/forms/:formSubmissionId?" element={<QMSForm />} />
+              {/* Redirect /login & /signup to dashboard if user is already logged in */}
+            <Route path="/login" element={<Navigate to="/admin" />} />
+            <Route path="/signup" element={<Navigate to="/admin" />} />
+
 
             {/* Add more admin routes here */}
           </Route>
@@ -55,10 +70,16 @@ function App() {
             <Route path="/superadmin/admins/add" element={<SuperAdminAddAdminForm />} />
             <Route path="/superadmin/admins/:adminId/edit" element={<SuperadminEditAdminForm />} /> 
             {/* Add more superadmin routes here */}
+              {/* Redirect /login & /signup to dashboard if user is already logged in */}
+            <Route path="/login" element={<Navigate to="/superadmin" />} />
+            <Route path="/signup" element={<Navigate to="/superadmin" />} />
+
           </Route>
 
           {/* Redirect to home if no match */}
           <Route path="*" element={<Navigate to="/" />} />
+
+
         </Routes>
       </div>
     </AuthProvider>

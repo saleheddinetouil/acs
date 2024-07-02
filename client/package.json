@@ -5,6 +5,8 @@
   "dependencies": {
     "@fortawesome/free-solid-svg-icons": "^6.5.2",
     "@fortawesome/react-fontawesome": "^0.2.2",
+    "@headlessui/react": "^2.1.1",
+    "@heroicons/react": "^2.1.4",
     "@stripe/react-stripe-js": "^2.7.1",
     "@stripe/stripe-js": "^3.4.1",
     "@testing-library/jest-dom": "^5.17.0",

@@ -176,6 +176,20 @@ router.delete('/forms/:formId', async (req,res) => {
     }
 });
 
+// Delete all forms
+router.delete('/forms', async (req, res) => {
+    try {
+        await FormSubmission.deleteMany({});
+
+        res.status(200).json({ message: 'All form submissions deleted' });
+
+    } catch (err) {
+        console.error('Error deleting form submissions:', err);
+        res.status(500).json({ error: 'Error deleting form submissions' });
+    }
+});
+
+
 // edit user profile
 router.put('/profile', auth, async (req, res) => {
     try {

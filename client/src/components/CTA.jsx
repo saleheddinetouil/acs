@@ -11,14 +11,15 @@ const CTA = () => {
             Ready to get your quality management system in order?
             </h2>
             <p className="mb-6">
-            Sign up for an account today and get started!
+            Sign up for an account today!
             </p>
             <button className="bg-white text-blue-600 py-2 px-6 rounded-full"onClick={navigate} >
-            Sign up
+            Get Started
             </button>
         </div>
         </section>
     );
     }
+
 
 export default CTA;

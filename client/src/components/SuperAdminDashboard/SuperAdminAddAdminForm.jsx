@@ -19,11 +19,27 @@ const SuperAdminAddAdminForm = () => {
   const [error, setError] = useState(null);
 
   const handleChange = (e) => {
+    if (error) setError(null);
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (formData.phone.length !== 11) {
+      setError('Phone number must be 11 digits.');
+      return;
+    }
+    let i = 0;
+    for (i = 0; i < formData.phone.length; i++) {
+      if (isNaN(formData.phone.charAt(i))) {
+        setError('Phone number must be numeric.');
+        return;
+      }
+    }
+
+
+
+    
     try {
       await axios.post('/superadmin/admins/add', formData, { // Add admin route
         headers: Auth.authHeader(),

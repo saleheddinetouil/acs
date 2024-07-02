@@ -52,16 +52,8 @@ const SuperAdminDashboard = () => {
 
       {/* Superadmin Information */}
       <div className="bg-white rounded-lg shadow-md p-6 mb-6">
-        <h2 className="text-xl font-bold mb-2">Your Information</h2>
-        <p><strong>Name:</strong> {user.firstName} {user.lastName}</p>
-        <p><strong>Email:</strong> {user.email}</p>
         <p><strong>Admins Managed:</strong> {admins.length}</p>
-        <Link to="/superadmin/profile" className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mt-4 inline-block">
-          Edit Profile
-        </Link>
-
-
-        
+        <p><strong>Admins Paid:</strong> {admins.filter(admin => admin.isPaid).length}</p>
       </div>
 
       {/* Admin Management Section */}
@@ -78,13 +70,7 @@ const SuperAdminDashboard = () => {
         </Link>
       </div>
 
-
-      <button
-        onClick={handleLogout}
-        className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded"
-      >
-        Logout
-      </button>
+      {/* Forms submitted related to this admin business */}
     </div>
     </>
   );

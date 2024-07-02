@@ -23,6 +23,11 @@ const AdminAddUserForm = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (formData.phone.length !== 11) {
+      setError('Phone number must be 11 digits.');
+      return;
+    }
+
     const adminId = user._id;
     try {
       await axios.post('/admin/users/add', {adminId:adminId,formData}, { 
@@ -44,7 +49,13 @@ const AdminAddUserForm = () => {
 
     <div className="container mx-auto px-4 py-8">
       <h1 className="text-3xl font-bold mb-4">Add New User</h1>
-      {error && <div className="text-red-500 mb-4">{error}</div>}
+      {error && 
+      <div className="text-red-500 mb-4">
+        <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative" role="alert">
+          <span className="block sm:inline">{error}</span>
+        </div>
+      </div>}
+
       <form onSubmit={handleSubmit} className="bg-white rounded-lg shadow-md p-6">
         {/* First Name, Last Name, Email, Password (Text Inputs) */}
         <div className="mb-4 text-left">
@@ -78,7 +89,7 @@ const AdminAddUserForm = () => {
             type="text"
             id="phone"
             name="phone"
-            value={formData.phone}
+            value={formData.phone || '216'}
             onChange={handleChange}
             className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
             required

@@ -11,9 +11,38 @@ import PaymentPage from '../PaymentPage'
 const AdminDashboard = () => {
   const { user } = useContext(AuthContext);
   const [users, setUsers] = useState([]);
+  const [forms, setForms] = useState([]);
+  const [admin, setAdmin] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
+    const fetchAdmin = async () => {
+      try {
+        const response = await axios.get(`/admin/${user._id}`, {
+          headers: "Bearer " + Auth.getToken(),
+        });
+        setAdmin(response.data);
+      } catch (error) {
+        console.error('Error fetching admin:', error);
+      }
+    };
+
+
+
+    const fetchForms = async () => {
+      try {
+        const response = await axios.post('/admin/forms',
+        {adminId:user._id}, {
+          headers: "Bearer " + Auth.getToken(),
+      });
+        setForms(response.data);
+      } catch (error) {
+        console.error('Error fetching forms:', error);
+      }
+    };
+
+
+
     const fetchUsers = async () => {
       const adminId = user._id;
       try {
@@ -33,7 +62,16 @@ const AdminDashboard = () => {
 
     if (user) {
       fetchUsers();
+      fetchForms();
     }
+
+    if (user && user.role === 'admin') {
+      fetchAdmin();
+      setAdmin(user);
+    }
+
+
+
   }, [user]);
 
   if (isLoading) {
@@ -60,23 +98,7 @@ const AdminDashboard = () => {
       
       <h1 className="text-3xl font-bold mb-4">Admin Dashboard</h1>
 
-      {/* Admin Information */}
-      <div className="bg-white rounded-lg shadow-md p-6 mb-6">
-        <h2 className="text-xl font-bold mb-2">Admin Information</h2>
-        <p><strong>Business Name:</strong> {user.businessName}</p>
-        <p><strong>Name:</strong> {user.firstName} {user.lastName}</p>
-        <p><strong>Email:</strong> {user.email}</p>
-        <p><strong>Phone:</strong> {user.phone}</p>
-        <p><strong>Payment Status:</strong> {user.isPaid ? 'Paid' : 'Not Paid'}</p>
-        {user.isPaid && (
-          <p><strong>Payment Type:</strong> {user.paymentType}</p>
-        )}
-        <p><strong>Users Managed:</strong> {users.length}</p>
-                {/* edit prodile button */}
-                <Link to="/admin/profile" className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mt-4 inline-block">
-          Edit Profile
-        </Link>
-      </div>
+
 
       {/* User Management Section */}
       <div className="bg-white rounded-lg shadow-md p-6 mb-6">
@@ -92,6 +114,42 @@ const AdminDashboard = () => {
         </Link>
       </div>
 
+      {/* Forms submitted by users of the admin */}
+      <div className="bg-white rounded-lg shadow-md p-6 mb-6">
+        <h2 className="text-xl font-bold mb-2">Forms Submitted by Users</h2>
+        {/* Forms Table */}
+        <table className="w-full">
+          <thead>
+            <tr>
+              <th className="border px-4 py-2">Num</th>  
+              <th className="border px-4 py-2">User</th>
+              <th className="border px-4 py-2">Submitted At</th>
+              <th className="border px-4 py-2">Updated By</th>
+              <th className="border px-4 py-2">Updated At</th>
+              <th className="border px-4 py-2">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {forms.map(form => (
+              <tr key={form._id}>
+                <td className="border px-4 py-2">{form.numId}</td>
+                <td className="border px-4 py-2">{form.userId}</td>
+                <td className="border px-4 py-2">{form.createdAt}</td>
+                <td className="border px-4 py-2">{form.lastEditedBy}</td>
+                <td className="border px-4 py-2">{form.updatedAt}</td>
+                <td className="border px-4 py-2">
+                  <Link to={`/admin/forms/${form._id}`} className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+                    View
+                  </Link>
+                </td>
+                
+
+
+              </tr>
+            ))} 
+          </tbody>
+        </table>
+      </div>
     </div>
     </>
   );
@@ -99,3 +157,32 @@ const AdminDashboard = () => {
 };
 
 export default AdminDashboard;
+/*
+
+TODO
+
+ADMIN SEES THE FORMS SUBMITTED BY USERS ( mention users ) - ok
+
+DELETE ALL FORMS 
+
+ACS --> LOGO ACS - ok
+
+LOGOUT MELLOUTA REMOVE - ok 
+
+SIGNUP DOESNT HAVE AUTHCONTEXT - ok
+
+LOGIN APGE LESS WIDTH remove super admin user - ok
+
+users and nafss ladmin  andhom nafss l form - ok
+
+superadmin condition noumrou 
+
+conditionnement ala noumrou tel - ok
+
+kol admin 9adech andou men user - ok 
+
+profile feha profile details o logout
+
+admin maandouch view stats button
+
+*/

@@ -15,6 +15,7 @@ const SuperadminEditAdminForm = () => {
     lastName: '',
     email: '',
     password: '', 
+    phone: '',
     isPaid: false, 
     paymentType: 'cash',
   });
@@ -31,7 +32,7 @@ const SuperadminEditAdminForm = () => {
           firstName: response.data.firstName,
           lastName: response.data.lastName,
           email: response.data.email,
-          // Don't fetch password from server
+          phone: response.data.phone,
           isPaid: response.data.isPaid,
           paymentType: response.data.paymentType, 
           
@@ -50,11 +51,17 @@ const SuperadminEditAdminForm = () => {
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
     const inputValue = type === 'checkbox' ? checked : value;
+
     setFormData({ ...formData, [name]: inputValue });
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    // check if phone number is valid
+    if (formData.phone.length !== 11) {
+      return setError('Phone number must be 11 digits.');
+    }
+    
     try {
       await axios.put(`/superadmin/admins/${adminId}`, formData, {
         headers: Auth.authHeader(),
@@ -75,6 +82,7 @@ const SuperadminEditAdminForm = () => {
     <div className="container mx-auto px-4 py-8">
       <h1 className="text-3xl font-bold mb-4">Edit Admin</h1>
       {error && <div className="text-red-500 mb-4">{error}</div>}
+      
       {isLoading ? (
         <div>Loading...</div>
       ) : (

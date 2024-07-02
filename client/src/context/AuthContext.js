@@ -20,6 +20,9 @@ const AuthProvider = ({ children }) => {
           const role = decodedToken.userId ? 'user' :
                        decodedToken.adminId ? 'admin' :
                        decodedToken.superAdminId ? 'superadmin' : null;
+          const isAdmin = role === 'admin';
+          const isSuperAdmin = role === 'superadmin';
+          
 
           
           if (!role) {

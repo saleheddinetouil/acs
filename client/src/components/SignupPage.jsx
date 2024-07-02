@@ -1,7 +1,9 @@
 import React, { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, Navigate, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import Navbar from './Navbar';
+import Auth from '../utils/Auth';
+
 
 
 
@@ -28,11 +30,32 @@ const SignupPage = () => {
     }
   };
 
+  const handleLoading = () => {
+    if (error) {
+      return 'Loading...';
+    }
+    
+  };
+  // if connected navigate to admin dashboard
+  if (Auth.isLoggedIn()) {
+    return <Navigate to="/" replace />;
+  }
+
+
+
+
+
+
+
+  
+
+
+  
   return (
     <>
     <Navbar />
     <div className="flex flex-col items-center justify-center min-h-screen bg-gray-100">
-      <div className="container mx-auto bg-white rounded-lg shadow-md p-8">
+      <div className="container mx-auto bg-white rounded-lg shadow-md p-8 w-96">
         <h2 className="text-2xl font-bold text-gray-800 mb-6">Sign Up</h2>
         {error && <p className="text-red-500 mb-4 ">{error}</p>}
         <form onSubmit={handleSubmit}>

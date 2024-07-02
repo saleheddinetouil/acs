@@ -43,6 +43,19 @@ const UserDashboard = () => {
 
   }, [user]);
 
+  const DeleteAll = async () => {
+    try {
+      await axios.delete(`/user/forms`, {
+        headers: Auth.authHeader(),
+      });
+
+      setForms([]);
+    } catch (error) {
+      console.error('Error deleting all form submissions:', error);
+    }
+
+  };
+
   // Function to handle search input
   const handleSearchChange = (event) => {
     setSearchTerm(event.target.value);
@@ -276,32 +289,12 @@ const UserDashboard = () => {
     <div className="container mx-auto px-4 py-8">
       <h1 className="text-3xl font-bold mb-4">User Dashboard</h1>
 
-      <div className="bg-white rounded-lg shadow-md p-6 mb-6">
-        <h2 className="text-xl font-bold mb-2">User Information</h2>
-        <p><strong>Name:</strong> {user.firstName} {user.lastName}</p>
-        <p><strong>Email:</strong> {user.email}</p>
-        <p><strong>Phone:</strong> {user.phone}</p>
-        <p><strong>Business Name:</strong> {user.businessName}</p>
-        
-        <p><strong>Forms Submitted:</strong> {forms.length}</p>
 
-        {/* edit prodile button */}
-        <Link to="/profile" className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mt-4 inline-block">
-          Edit Profile
-        </Link>
-        {/* TODO add stats button admin user */}
-        <Link to="/stats" className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mt-4 inline-block ml-2">
-        Stats
-        </Link>
-      </div>
-      {/* indicators :
-      Nombre Total d’actions
-Nombre d’actions en cours
-Nombre d’actions clôturées.
-      */}
-      {forms.length === 0 && (
+
+      {forms.length !== 0 && (
         <div className="bg-white rounded-lg shadow-md p-6 mb-6">
         <h2 className="text-xl font-bold mb-2">Indicators</h2>
+        <p><strong>Forms Submitted:</strong> {forms.length}</p>
         <p><strong>Total Actions:</strong> {forms.length}</p>
         <p><strong>Actions in Progress:</strong> {forms.filter(form => form.formData.etatAction === 'EN COURS').length}</p>
         <p><strong>Closed Actions:</strong> {forms.filter(form => form.formData.etatAction === 'CLOTUREE').length}</p>
@@ -427,18 +420,19 @@ Nombre d’actions clôturées.
                     <td className="border px-4 py-2">{form.formData.necessityMajRO ? 'OUI' : 'NON'}</td>
                     <td className="border px-4 py-2">{form.formData.necessityModifierSMQ}</td>
                     <td className="border  px-4 py-2 text-center whitespace-nowrap px-4 py-2">
+                    <Link
+                        to={`/user/forms/${form._id}`}
+                        className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-1 px-2 rounded"
+                      >
+                        Edit
+                      </Link>
                       <button
                         onClick={() => handleDeleteSubmission(form._id)}
                         className="bg-red-500 hover:bg-red-700 text-white font-bold py-1 px-2 rounded mr-2"
                       >
                         Delete
                       </button>
-                      <Link
-                        to={`/user/forms/${form._id}`}
-                        className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-1 px-2 rounded"
-                      >
-                        View
-                      </Link>
+                   
                     </td>
                   </tr>
                 ))}
@@ -498,6 +492,14 @@ Nombre d’actions clôturées.
           >
             Import from Excel
           </label>
+          {/* delete all */}
+          <button
+            onClick={() => DeleteAll()}
+            className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded ml-2"
+          >
+            Delete All
+          </button>
+
         </div>
       </div>
 

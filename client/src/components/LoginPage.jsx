@@ -2,6 +2,8 @@ import React, { useState, useContext } from 'react';
 import { Link, Navigate, useNavigate } from 'react-router-dom';
 import { AuthContext } from '../context/AuthContext';
 import Navbar from './Navbar';
+import axios from 'axios';
+
 
 const LoginPage = () => {
   const { user, login } = useContext(AuthContext);
@@ -10,13 +12,32 @@ const LoginPage = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState(null);
+  const [role, setRole] = useState(null);
   const navigate = useNavigate();
+  const fetchRole = async () => {
+    try {
+      const response = await axios.post('/auth/role', {
+        email,
+      }
+      );
+      setRole(response.data.role);
+      return response.data.role;
+
+    } catch (error) {
+      console.error('Error fetching role:', error);
+    }
+  };
+
+
+
+  fetchRole();
 
   const handleSubmit = async (event) => {
     event.preventDefault();
     try {
-      await login(email, password, activeTab); 
-      navigate(`/${activeTab}`); 
+
+      await login(email, password, role); 
+      navigate(`/${role}`); // Redirect to user dashboard (or appropriate role dashboard)
     } catch (err) {
       setError(err.response.data.error || 'Invalid credentials');
     }
@@ -28,34 +49,12 @@ const LoginPage = () => {
   return (
     <>
     <Navbar />
-    <div className="flex flex-col items-center justify-center min-h-screen bg-gray-100">
-      <div className="container mx-auto bg-white rounded-lg shadow-md p-8">
+    <div className="flex flex-col items-center justify-center min-h-screen bg-gray-100 ">
+      <div className="container mx-auto bg-white rounded-lg shadow-md p-8 w-96">
         <h2 className="text-2xl font-bold text-gray-800 mb-6">Login Portal</h2>
         
-        {/* Tab Navigation */}
-        <div className="flex border-b border-gray-200 mb-6 justify-center">
-          <button 
-            onClick={() => setActiveTab('user')}
-            className={`py-2 px-4 font-medium text-gray-700 ${activeTab === 'user' ? 'border-b-2 border-blue-500' : ''}`}
-          >
-            User
-          </button>
-          <button 
-            onClick={() => setActiveTab('admin')}
-            className={`py-2 px-4 font-medium text-gray-700 ${activeTab === 'admin' ? 'border-b-2 border-blue-500' : ''}`}
-          >
-            Admin
-          </button>
-          <button 
-            onClick={() => setActiveTab('superadmin')}
-            className={`py-2 px-4 font-medium text-gray-700 ${activeTab === 'superadmin' ? 'border-b-2 border-blue-500' : ''}`}
-          >
-            Super
-          </button>
-        </div>
-
         {error && <p className="text-red-500 mb-4">{error}</p>}
-        <form onSubmit={handleSubmit}>
+        <form onSubmit={handleSubmit} className="bg-white rounded-lg shadow-md p-6">
           {/* Email Field */}
           <div className="mb-4">
             <label htmlFor="email" className="block text-gray-700 text-sm font-bold mb-2 flex flex-start ml-4 ">
