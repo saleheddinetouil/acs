@@ -4,150 +4,167 @@ import axios from 'axios';
 import Navbar from './Navbar';
 import Auth from '../utils/Auth';
 
-
-
-
+// Import your icon library (e.g., Font Awesome, Heroicons)
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faUserPlus, faEnvelope, faLock, faBuilding, faPhone, faPeopleGroup } from '@fortawesome/free-solid-svg-icons';
 
 const SignupPage = () => {
   const [name, setName] = useState('');
+  const [lname, setLname] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [bname, setBname] = useState('');
-  const [error, setError] = useState(null);
-  const [lname, setLname] = useState('');
   const [phone, setPhone] = useState('');
+  const [error, setError] = useState(null);
   const navigate = useNavigate();
 
   const handleSubmit = async (event) => {
     event.preventDefault();
     try {
-      const response = await axios.post('/auth/signup', { name,lname,bname, email,phone, password });
-
+      const response = await axios.post('/auth/signup', { name, lname, bname, email, phone, password });
       localStorage.setItem('token', response.data.token);
-      navigate('/admin'); // Redirect to user dashboard (or appropriate role dashboard)
+      navigate('/admin'); 
     } catch (err) {
       setError(err.response.data.message);
     }
   };
 
-  const handleLoading = () => {
-    if (error) {
-      return 'Loading...';
-    }
-    
-  };
-  // if connected navigate to admin dashboard
   if (Auth.isLoggedIn()) {
     return <Navigate to="/" replace />;
   }
 
-
-
-
-
-
-
-  
-
-
-  
   return (
     <>
-    <Navbar />
-    <div className="flex flex-col items-center justify-center min-h-screen bg-gray-100">
-      <div className="container mx-auto bg-white rounded-lg shadow-md p-8 w-96">
-        <h2 className="text-2xl font-bold text-gray-800 mb-6">Sign Up</h2>
-        {error && <p className="text-red-500 mb-4 ">{error}</p>}
-        <form onSubmit={handleSubmit}>
-          <div className="mb-4 text-left">
-            <label htmlFor="name" className="block text-gray-700 text-sm font-bold mb-2">
-              First Name
-            </label>
-            <input
-              type="text"
-              id="name"
-              className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-            />
-          </div>
-          <div className="mb-4 text-left">
-            <label htmlFor="lname" className="block text-gray-700 text-sm font-bold mb-2 ">
-              Last Name 
-            </label>
-            <input
-              type="text"
-              id="lname"
-              className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline "
-              value={lname}
-              onChange={(e) => setLname(e.target.value)}
-            />
-          </div>
-<div className="mb-4 text-left">
-            <label htmlFor="bname" className="block text-gray-700 text-sm font-bold mb-2">
-              Business Name
-            </label>
-            <input
-              type="text"
-              id="bname"
-              className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-              value={bname}
-              onChange={(e) => setBname(e.target.value)}
-            />
-          </div>
-          <div className="mb-4 text-left">
-            <label htmlFor="phone" className="block text-gray-700 text-sm font-bold mb-2">
-              Phone
-            </label>
-            <input
-              type="text"
-              id="phone"
-              className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-              value={phone}
-              onChange={(e) => setPhone(e.target.value)}                  
-            />
-          </div>
+      <Navbar />
+      <div className="flex items-center justify-center min-h-screen bg-gradient-to-br from-blue-400 to-purple-500"> 
+        <div className="bg-white rounded-lg shadow-2xl p-8 max-w-md w-full">
+          <h2 className="text-2xl font-bold text-gray-800 mb-6 text-center">
+            <FontAwesomeIcon icon={faUserPlus} className="mr-2 text-lg" /> 
+            Create Your Account
+          </h2>
 
+          {error && <p className="text-red-500 mb-4 text-center">{error}</p>}
 
+          <form onSubmit={handleSubmit} className="space-y-4">
+            {/* First Name Field */}
+            <div className="relative">
+              <input
+                type="text"
+                id="name"
+                placeholder="First Name"
+                className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                style={{ paddingLeft: '2.3rem' }}
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                required
+              />
+              <div className="absolute inset-y-0 left-3 flex items-center text-gray-400">
+                <FontAwesomeIcon icon={faUserPlus} /> 
+              </div>
+            </div>
 
-          <div className="mb-4 text-left">
-            <label htmlFor="email" className="block text-gray-700 text-sm font-bold mb-2">
-              Email
-            </label>
-            <input
-              type="email"
-              id="email"
-              className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-            />
-          </div>
-          <div className="mb-4 text-left">
-            <label htmlFor="password" className="block text-gray-700 text-sm font-bold mb-2">
-              Password
-            </label>
-            <input
-              type="password"
-              id="password"
-              className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-            />
-          </div>
-          <div className="flex items-center justify-between">
+            {/* Last Name Field */}
+            <div className="relative">
+              <input
+                type="text"
+                id="lname"
+                placeholder="Last Name"
+                className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                style={{ paddingLeft: '2.3rem' }}
+                value={lname}
+                onChange={(e) => setLname(e.target.value)}
+                required
+              />
+              <div className="absolute inset-y-0 left-3 flex items-center text-gray-400">
+                <FontAwesomeIcon icon={faPeopleGroup} /> 
+              </div>
+            </div>
+
+            {/* Business Name Field */}
+            <div className="relative">
+              <input
+                type="text"
+                id="bname"
+                placeholder="Business Name"
+                className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                style={{ paddingLeft: '2.3rem' }}
+                value={bname}
+                onChange={(e) => setBname(e.target.value)}
+                required
+              />
+              <div className="absolute inset-y-0 left-3 flex items-center text-gray-400">
+                <FontAwesomeIcon icon={faBuilding} /> 
+              </div>
+            </div>
+
+            {/* Phone Field */}
+            <div className="relative">
+              <input
+                type="tel"
+                id="phone"
+                placeholder="Phone Number"
+                className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                style={{ paddingLeft: '2.3rem' }}
+                value={phone}
+                onChange={(e) => setPhone(e.target.value)}
+                required
+              />
+              <div className="absolute inset-y-0 left-3 flex items-center text-gray-400">
+                <FontAwesomeIcon icon={faPhone} /> 
+              </div>
+            </div>
+
+            {/* Email Field */}
+            <div className="relative">
+              <input
+                type="email"
+                id="email"
+                placeholder="Email"
+                className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                style={{ paddingLeft: '2.3rem' }}
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                required
+              />
+              <div className="absolute inset-y-0 left-3 flex items-center text-gray-400">
+                <FontAwesomeIcon icon={faEnvelope} />
+              </div>
+            </div>
+
+            {/* Password Field */}
+            <div className="relative">
+              
+              <input
+                type="password"
+                id="password"
+                placeholder="Password"
+                className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                style={{ paddingLeft: '2.3rem' }}
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required
+              />
+              <div className="absolute inset-y-0 left-3 flex items-center text-gray-400">
+                <FontAwesomeIcon icon={faLock} />
+              </div>
+            </div>
+
             <button
               type="submit"
-              className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus-shadow-outline"
+              className="bg-blue-500 hover:bg-blue-600 text-white font-bold py-3 px-6 rounded-lg focus:outline-none focus:shadow-outline w-full transform transition duration-300 hover:scale-105"
             >
               Sign Up
             </button>
-            <Link to="/login" className="inline-block align-baseline font-bold text-sm text-blue-500 hover:text-blue-800">
-              Already have an account? Login
-            </Link>
-          </div>
-        </form>
+
+            <div className="text-center text-gray-600">
+              Already have an account?{' '}
+              <Link to="/login" className="text-blue-500 hover:text-blue-700 font-bold">
+                Login
+              </Link>
+            </div>
+          </form>
+        </div>
       </div>
-    </div>
     </>
   );
 };

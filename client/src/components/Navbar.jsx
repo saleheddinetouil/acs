@@ -1,14 +1,16 @@
 import React, { useContext } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { AuthContext } from '../context/AuthContext';
-import { Menu, MenuButton, MenuItem, MenuItems } from '@headlessui/react'
+import { Menu, MenuButton, MenuItem, MenuItems } from '@headlessui/react';
 import Auth from '../utils/Auth';
 
-
-
+// Import your icon library (e.g., Font Awesome, Heroicons)
+// Example for Font Awesome:
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faUserCircle, faSignOutAlt, faSignIn, faUserPlus,faChartLine, faUserAlt, faDatabase} from '@fortawesome/free-solid-svg-icons';
 
 function classNames(...classes) {
-  return classes.filter(Boolean).join(' ')
+  return classes.filter(Boolean).join(' ');
 }
 
 const Navbar = () => {
@@ -20,59 +22,49 @@ const Navbar = () => {
     navigate('/login');
   };
 
-
-
-
-
-
   const userNavigation = [
-    { name: 'Dashboard', href: '/'+Auth.getRole() },
-    { name: 'Profile', href: '/'+Auth.getRole()+"/profile" },
-    { name: 'Logout', href: '' , onClick: handleLogout},
-  ]
-
+    { name: 'Dashboard', href: '/' + Auth.getRole()  , icon: faDatabase},
+    { name: 'Profile', href: '/' + Auth.getRole() + "/profile" , icon: faUserAlt},
+    {name:'Stats',href:'/stats' , icon: faChartLine},
+    { name: 'Logout', href: '', onClick: handleLogout, icon: faSignOutAlt }, // Add icon property
+  ];
 
   return (
     <nav className="bg-white shadow-md">
       <div className="container mx-auto px-4 py-3 flex justify-between items-center">
-
-      
-        
         <Link to="/" className="text-xl font-bold text-gray-800">
           <img src="https://i.ibb.co/HNX7Z6h/logo.png" alt="logo" style={{height:'88px'}} />
         </Link>
         <ul className="flex space-x-6">
-          {user ? ( // User is logged in
+          {user ? ( 
             <>
-
               <li>
-
                 <Menu as="div" className="relative inline-block text-left">
-                  <div>
-                    <MenuButton className="inline-flex justify-center w-full rounded-md shadow-sm px-4 py-2 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2">
-                      <img src='https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQv_oL1l60gN7zHc_fMS11OeFR-mLDi3DgjNg&s' className='h-9 w-9' alt='profile' />
+                  <div className="flex items-center space-x-2 cursor-pointer">
+
+                    <MenuButton className="inline-flex items-center justify-center w-full rounded-md shadow-sm px-4 py-2 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2">
+                      <FontAwesomeIcon icon={faUserCircle} className="mr-2 text-xl"  style={{fontSize: '1.5rem'}} />
+                      {user.firstName}
                     </MenuButton>
                   </div>
                   <MenuItems className="absolute right-0 w-56 mt-2 origin-top-right bg-white divide-y divide-gray-100 rounded-md shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
                     {userNavigation.map((item) => (
-                      <MenuItem key={item.name}>
+                      <MenuItem key={item.name} style={{minWidth: '200px', padding: '0.5rem 1rem',fontSize: '1rem'}}>
                         {({ active }) => (
-                          <>
-
                           <Link
                             to={item.href}
                             className={classNames(
                               active ? 'bg-gray-100' : '',
-                              'block px-4 py-2 text-sm text-gray-700'
+                              'block px-4 py-2 text-sm text-gray-700 flex items-center' 
                             )}
                             onClick={item.onClick}
                           >
+                            {item.icon && ( 
+                              <FontAwesomeIcon icon={item.icon} className="mr-2" style={{fontSize: '1rem'}} />
+                            )}
                             {item.name}
                           </Link>
-
-                                        </>
                         )}
-          
                       </MenuItem>
                     ))}
                   </MenuItems>
@@ -82,12 +74,13 @@ const Navbar = () => {
           ) : ( // User is not logged in
             <>
               <li>
-                <Link to="/login" className="hover:text-blue-500">
-                  Login
+                <Link to="/login" className="mr-4 hover:text-blue-500">
+                  <FontAwesomeIcon icon={faSignIn} className="mr-2" /> Login  
                 </Link>
               </li>
               <li>
-                <Link to="/signup" className="hover:text-blue-500">
+                <Link to="/signup" className="hover:text-blue-500 ">
+                  <FontAwesomeIcon icon={faUserPlus} className="mr-2" />
                   Signup
                 </Link>
               </li>
@@ -95,7 +88,6 @@ const Navbar = () => {
           )}
         </ul>
       </div>
-     
     </nav>
   );
 };

@@ -1,5 +1,6 @@
 import React, {  } from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom'; 
+import { useState, useEffect, useContext } from 'react';
 import { AuthProvider } from './context/AuthContext'; 
 import ProtectedRoute from './components/ProtectedRoute'; 
 import LandingPage from './components/LandingPage';
@@ -18,6 +19,8 @@ import AdminProfileEdit from './components/AdminProfileEdit';
 import SuperAdminProfileEdit from './components/SuperAdminProfileEdit';
 import Stats from './components/dashboards/Stats';
 import axios from 'axios';
+import { AuthContext } from './context/AuthContext';
+import './App.css';
 
 axios.defaults.baseURL = 'http://localhost:5000';
 
@@ -55,7 +58,6 @@ function App() {
             <Route path="/admin/profile" element={<AdminProfileEdit  />} />
             <Route path="/admin/users/add" element={<AdminAddUserForm />} />
             <Route path="/admin/users/:userId/edit" element={<AdminEditUserForm />} /> 
-            <Route path="/admin/forms/:formSubmissionId?" element={<QMSForm />} />
               {/* Redirect /login & /signup to dashboard if user is already logged in */}
             <Route path="/login" element={<Navigate to="/admin" />} />
             <Route path="/signup" element={<Navigate to="/admin" />} />

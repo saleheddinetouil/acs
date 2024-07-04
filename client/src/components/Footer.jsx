@@ -26,7 +26,7 @@ const Footer = () => {
           </div>
           <div className="w-full md:w-1/4 px-4 mb-6 md:mb-0">
             <h4 className="text-lg font-bold mb-4">Follow Us</h4>
-            <div className="flex space-x-4 items-center justify-center">
+            <div className="flex space-x-4 items-center justify-start">
               <a href="#" className="hover:text-blue-400">
                 <i className="fab fa-facebook-f text-2xl"></i>
               </a>
