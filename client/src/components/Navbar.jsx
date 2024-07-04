@@ -25,9 +25,13 @@ const Navbar = () => {
   const userNavigation = [
     { name: 'Dashboard', href: '/' + Auth.getRole()  , icon: faDatabase},
     { name: 'Profile', href: '/' + Auth.getRole() + "/profile" , icon: faUserAlt},
-    {name:'Stats',href:'/stats' , icon: faChartLine},
+
     { name: 'Logout', href: '', onClick: handleLogout, icon: faSignOutAlt }, // Add icon property
   ];
+  // 
+  if (Auth.getRole() === 'user') {
+    userNavigation.push({name:'Analytics',href:'/stats' , icon: faChartLine},);
+  }
 
   return (
     <nav className="bg-white shadow-md">

@@ -296,7 +296,7 @@ const UserDashboard = () => {
     <>
     <Navbar />
     <div className=" mx-auto px-4 py-8">
-      <h1 className="text-3xl font-bold mb-6">User Dashboard</h1>
+      <h1 className="text-3xl text-+ font-bold mb-6">User Dashboard</h1>
 
   
 

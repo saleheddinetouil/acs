@@ -65,8 +65,9 @@ const ProfileEdit = () => {
         headers: Auth.authHeader()
       });
 
-      // Update user data in the AuthContext
-      setUser(response.data.user); 
+      // Update user in AuthContext
+      setUser(response.data);
+      
       setSuccessMessage('Profile updated successfully!');
     } catch (error) {
       console.error('Profile update error:', error);
