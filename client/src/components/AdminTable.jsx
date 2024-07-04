@@ -32,7 +32,7 @@ const AdminTable = ({ users }) => {
               <span className="bg-green-500 text-white font-bold py-1 px-2 rounded">Paid</span> : 
               <span className="bg-red-500 text-white font-bold py-1 px-2 rounded">No</span>}
             </td>
-            <td className="px-4 py-2 text-gray-700">{user.paymentType && user.isPaid ? user.paymentType : 'N/A'
+            <td className="px-4 py-2 text-gray-700">{user.paymentType && user.isPaid ? user.paymentType : ''
             
             }</td>
 

@@ -74,9 +74,16 @@ const AdminDashboard = () => {
 
   }, [user]);
 
+
   if (isLoading) {
     return <div>Loading...</div>;
   }
+  let closureRate = 0;
+  if (forms.length > 0) {
+    closureRate = (forms.filter(form => form.status === 'closed').length / forms.length) * 100;
+    console.log(closureRate);
+  }
+
 
   if (!user) {
     return <Navigate to="/login" replace />;
@@ -99,6 +106,47 @@ const AdminDashboard = () => {
       <h1 className="text-3xl font-bold mb-4">Admin Dashboard</h1>
 
 
+      {/*
+      
+      
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+
+      <div className="bg-white rounded-lg shadow-lg p-6 bg-indigo-500"> 
+        <div className="flex justify-between items-center">
+          <h3 className="text-xl font-bold text-white">Total Forms</h3>
+          <i className="fas fa-chart-line fa-2x text-white opacity-75"></i> 
+        </div>
+        <p className="text-3xl font-bold text-white">10</p>
+      </div>
+
+      
+      */}
+         {/* Display Admin Indicators */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+        <div className="bg-yellow-500 rounded-lg shadow-md p-6 mb-6">
+          <div className="flex justify-between items-center">
+            <h3 className="text-lg font-bold text-gray-800">Total Users</h3>
+            <i className="fas fa-users fa-2x text-gray-800 opacity-75"></i>
+          </div>
+          <p className="text-3xl font-bold text-gray-800">{users.length}</p>
+        </div>
+        <div className="bg-blue-500 rounded-lg shadow-md p-6 mb-6">
+          <div className="flex justify-between items-center">
+            <h3 className="text-lg font-bold text-gray-800">Total Forms</h3>
+            <i className="fas fa-file-alt fa-2x text-gray-800 opacity-75"></i>
+          </div>
+          <p className="text-3xl font-bold text-gray-800">{forms.length}</p>
+        </div>
+        <div className="shadow-md bg-green-500 rounded-lg p-6 mb-6">
+          <div className="flex justify-between items-center">
+            <h3 className="text-lg font-bold text-gray-800">Closure Rate</h3>
+            <i className="fas fa-chart-line fa-2x text-gray-800 opacity-75"></i>
+            </div>
+          <p className="text-3xl font-bold text-gray-800">{closureRate}</p>
+          </div>
+
+
+      </div>
 
       {/* User Management Section */}
       <div className="bg-white rounded-lg shadow-md p-6 mb-6">

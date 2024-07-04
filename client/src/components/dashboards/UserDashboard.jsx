@@ -189,7 +189,7 @@ const UserDashboard = () => {
   const handleImportExcel = async (data) => {
     try {
       setImportError(null);
-      const dataStartRow = 8; // Data starts from row 8 (index 7)
+      const dataStartRow = 8 || 1; // Data starts from row 8 (index 7)
 
       for (let i = dataStartRow; i < data.length; i++) {
         const rowData = data[i];
@@ -275,6 +275,15 @@ const UserDashboard = () => {
     }
   };
 
+     // Example data - adapt to your QMS data structure
+     const totalForms = forms.length;
+     const openActions = forms.filter(form => form.formData.etatAction === 'EN COURS').length;
+
+     let clotureeActions = forms.filter(form => form.formData.etatAction === 'CLOTUREE').length;
+
+     const actionClosureRate = (totalForms > 0) ? ((totalForms - openActions) / totalForms * 100).toFixed(2) : 0; 
+
+
   if (isLoading) {
     return <div>Loading...</div>;
   }
@@ -286,20 +295,47 @@ const UserDashboard = () => {
   return (
     <>
     <Navbar />
-    <div className="container mx-auto px-4 py-8">
-      <h1 className="text-3xl font-bold mb-4">User Dashboard</h1>
+    <div className=" mx-auto px-4 py-8">
+      <h1 className="text-3xl font-bold mb-6">User Dashboard</h1>
 
+  
 
-
-      {forms.length !== 0 && (
-        <div className="bg-white rounded-lg shadow-md p-6 mb-6">
-        <h2 className="text-xl font-bold mb-2">Indicators</h2>
-        <p><strong>Forms Submitted:</strong> {forms.length}</p>
-        <p><strong>Total Actions:</strong> {forms.length}</p>
-        <p><strong>Actions in Progress:</strong> {forms.filter(form => form.formData.etatAction === 'EN COURS').length}</p>
-        <p><strong>Closed Actions:</strong> {forms.filter(form => form.formData.etatAction === 'CLOTUREE').length}</p>
+      <div className="justify-center grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 gap-4">
+      {/* Card 1: Total Forms */}
+      <div className="bg-white rounded-lg shadow-lg p-6 bg-indigo-500"> 
+        <div className="flex justify-between items-center">
+          <h3 className="text-xl font-bold text-white">Total Forms</h3>
+          <i className="fas fa-chart-line fa-2x text-white opacity-75"></i> {/* Font Awesome Icon */}
+        </div>
+        <p className="text-3xl font-bold text-white">{totalForms}</p> {/* Replace with your value */}
       </div>
-      )}
+      {/* Card 2: Closure rate */}
+      <div className="bg-white rounded-lg shadow-lg p-6 bg-green-500">
+        <div className="flex justify-between items-center">
+          <h3 className="text-xl font-bold text-white">Closure Rate</h3>
+          <i className="fas fa-check-circle fa-2x text-white opacity-75"></i> {/* Font Awesome Icon */}
+        </div>
+        <p className="text-3xl font-bold text-white">{actionClosureRate}%</p> {/* Replace with your value */}
+      </div>
+      {/* Card 3: Closed Actions */}
+      <div className="bg-white rounded-lg shadow-lg p-6 bg-blue-500">
+        <div className="flex justify-between items-center">
+          <h3 className="text-xl font-bold text-white">Closed Actions</h3>
+          <i className="fas fa-check-circle fa-2x text-white opacity-75"></i> {/* Font Awesome Icon */}
+        </div>
+        <p className="text-3xl font-bold text-white">{clotureeActions}</p> {/* Replace with your value */}
+      </div>
+
+      {/* Card 4: Open Actions */}
+      <div className="bg-white rounded-lg shadow-lg p-6 bg-red-500"> 
+        <div className="flex justify-between items-center">
+          <h3 className="text-xl font-bold text-white">Open Actions</h3>
+          <i className="fas fa-exclamation-circle fa-2x text-white opacity-75"></i> {/* Font Awesome Icon */}
+        </div>
+        <p className="text-3xl font-bold text-white">{openActions}</p> {/* Replace with your value */}
+      </div>
+
+      </div>
 
       <div className="bg-white rounded-lg shadow-md p-6 mb-6">
         <h2 className="text-xl font-bold mb-2">All Form Submissions</h2>

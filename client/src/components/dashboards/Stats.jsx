@@ -1,6 +1,3 @@
-/*
-an iframe will be used to display the stats from the API
-*/
 import React from "react";
 import Navbar from '../Navbar';
 import { AuthContext } from '../../context/AuthContext';

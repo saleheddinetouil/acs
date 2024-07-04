@@ -3,11 +3,27 @@ import React, { createContext, useState, useEffect } from 'react';
 import axios from 'axios';
 
 axios.defaults.baseURL = 'http://localhost:5000';
+if (localStorage.getItem('token')){
+axios.headers = {
+  'Content-Type': 'application/json',
+'Authorization': `Bearer ${localStorage.getItem('token')}`
+};
+}
+else {
+  localStorage.removeItem('token');
+axios.headers = {
+  'Content-Type': 'application/json'
+};
+}
+
+
+
 
 const AuthContext = createContext();
 
 const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
+  
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
