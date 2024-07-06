@@ -21,7 +21,6 @@ const LoginPage = () => {
     try {
       const response = await axios.post('/auth/role', { email });
       setRole(response.data.role);
-      return response.data.role;
     } catch (error) {
       console.error('Error fetching role:', error);
     }

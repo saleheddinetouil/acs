@@ -9,7 +9,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faSearch } from '@fortawesome/free-solid-svg-icons';
 
 const UserDashboard = () => {
-  const { user } = useContext(AuthContext);
+  const {user} = useContext(AuthContext);
   const [forms, setForms] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [importError, setImportError] = useState(null); // State for import errors
@@ -24,8 +24,7 @@ const UserDashboard = () => {
     const fetchForms = async () => {
       try {
         const response = await axios.post('/user/forms',
-          { adminId: user.adminId, userId: user._id }
-        , {
+        {adminId:user.adminId, userId:user._id}, {
           headers: Auth.authHeader(),
         });
 
@@ -122,7 +121,9 @@ const UserDashboard = () => {
 // Function to delete a form submission
   const handleDeleteSubmission = async (submissionId) => {
     try {
-      await axios.delete(`/user/delete-form/${submissionId}`, {
+      await axios.delete(`/user/delete-form/${submissionId}`, 
+        {adminId:user.adminId, userId:user._id, submissionId:submissionId},
+        {
         headers: Auth.authHeader(),
       });
       setForms(forms.filter((form) => form._id !== submissionId));
@@ -297,9 +298,6 @@ const UserDashboard = () => {
     <Navbar />
     <div className=" mx-auto px-4 py-8">
       <h1 className="text-3xl text-+ font-bold mb-6">User Dashboard</h1>
-
-  
-
       <div className="justify-center grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 gap-4">
       {/* Card 1: Total Forms */}
       <div className="bg-white rounded-lg shadow-lg p-6 bg-indigo-500"> 
@@ -334,9 +332,7 @@ const UserDashboard = () => {
         </div>
         <p className="text-3xl font-bold text-white">{openActions}</p> {/* Replace with your value */}
       </div>
-
       </div>
-
       <div className="bg-white rounded-lg shadow-md p-6 mb-6">
         <h2 className="text-xl font-bold mb-2">All Form Submissions</h2>
         {/* Display button add new form icon */}

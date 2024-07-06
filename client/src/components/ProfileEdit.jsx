@@ -8,7 +8,6 @@ import Navbar from './Navbar';
 const ProfileEdit = () => {
   const { user } = useContext(AuthContext);
   const navigate = useNavigate();
-  const [setUser] = useState(null);
   const [formData, setFormData] = useState({
     firstName: '',
     lastName: '',
@@ -25,10 +24,12 @@ const ProfileEdit = () => {
   useEffect(() => {
     if (user.role === 'user') {
         setFormData({
+            _id: user._id,
             firstName: user.firstName,
             lastName: user.lastName,
             email: user.email,
             phone: user.phone,
+            password: '',
             
         });
     } else if (user.role === 'admin') {
@@ -38,12 +39,15 @@ const ProfileEdit = () => {
             email: user.email,
             phone: user.phone,
             businessName: user.businessName,
+            password: '',
         });
     } else if (user.role === 'superadmin') {
         setFormData({
             firstName: user.firstName,
             lastName: user.lastName,
             email: user.email,
+            phone: user.phone,
+            password: '',
             
         });
     }
@@ -64,14 +68,12 @@ const ProfileEdit = () => {
       const response = await axios.put('/'+user.role+'/profile', formData, {
         headers: Auth.authHeader()
       });
-
-      // Update user in AuthContext
-      setUser(response.data);
-      
+      // refresh user data
+      Auth.setUser(response.data.user);
       setSuccessMessage('Profile updated successfully!');
     } catch (error) {
       console.error('Profile update error:', error);
-      setError(error.response.data.error || 'Failed to update profile.');
+      setError('Failed to update profile.');
     }
   };
 

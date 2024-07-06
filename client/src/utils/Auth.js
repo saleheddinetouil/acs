@@ -1,5 +1,13 @@
+// Desc: Auth helper functions
+// import JSON.parse 
+import JSON from 'json5';
+
 
 const Auth = {
+  getUser : () => {
+    return localStorage.getItem('user') ? localStorage.getItem('user') : null;
+  },
+
   getToken: () => {
     return localStorage.getItem('token');
   },
@@ -44,6 +52,8 @@ const Auth = {
     return null;
   },
 
+  
+
   getAdminId: () => {
     const token = Auth.getToken();
     if (token) {
@@ -60,6 +70,9 @@ const Auth = {
       return decodedToken.superAdminId || null;
     }
     return null;
+  },
+  setUser: (user) => {
+    localStorage.setItem('user', JSON.stringify(user));
   },
 
   

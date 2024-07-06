@@ -14,10 +14,13 @@ function classNames(...classes) {
 }
 
 const Navbar = () => {
-  const { user, logout } = useContext(AuthContext); 
+  const { logout } = useContext(AuthContext); 
   const navigate = useNavigate();
+
+  const user = Auth.getUser();
   
   const handleLogout = () => {
+    
     logout();
     navigate('/login');
   };
@@ -25,20 +28,28 @@ const Navbar = () => {
   const userNavigation = [
     { name: 'Dashboard', href: '/' + Auth.getRole()  , icon: faDatabase},
     { name: 'Profile', href: '/' + Auth.getRole() + "/profile" , icon: faUserAlt},
-
     { name: 'Logout', href: '', onClick: handleLogout, icon: faSignOutAlt }, // Add icon property
   ];
   // 
-  if (Auth.getRole() === 'user') {
-    userNavigation.push({name:'Analytics',href:'/stats' , icon: faChartLine},);
+  if (Auth.getRole() === 'user' || Auth.getRole() === 'admin'){
+    // push the analytics page to the user navigation before the logout
+    userNavigation.splice(-1, 0, { name: 'Analytics', href: '/'+Auth.getRole()+'/stats', icon: faChartLine });
   }
 
   return (
     <nav className="bg-white shadow-md">
       <div className="container mx-auto px-4 py-3 flex justify-between items-center">
+        {!user && (
         <Link to="/" className="text-xl font-bold text-gray-800">
           <img src="https://i.ibb.co/HNX7Z6h/logo.png" alt="logo" style={{height:'88px'}} />
-        </Link>
+        </Link>)
+        }
+        {user && (
+        <Link to={"/" + Auth.getRole()} className="text-xl font-bold text-gray-800">
+          <img src="https://i.ibb.co/HNX7Z6h/logo.png" alt="logo" style={{height:'88px'}} />
+        </Link>)
+        }
+
         <ul className="flex space-x-6">
           {user ? ( 
             <>

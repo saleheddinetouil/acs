@@ -5,7 +5,8 @@ import { AuthContext } from '../../context/AuthContext';
 import UserTable from '../UserTable';
 import Auth from '../../utils/Auth';
 import Navbar from '../Navbar';
-import PaymentPage from '../PaymentPage'
+import PaymentPage from '../PaymentPage';
+import FormHistory from './FormHistory';
 
 
 const AdminDashboard = () => {
@@ -14,6 +15,7 @@ const AdminDashboard = () => {
   const [forms, setForms] = useState([]);
   const [admin, setAdmin] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [selectedFormId, setSelectedFormId] = useState(null);
 
   useEffect(() => {
     const fetchAdmin = async () => {
@@ -73,7 +75,9 @@ const AdminDashboard = () => {
 
 
   }, [user]);
-
+  const handleFormSelect = (formId) => {
+    setSelectedFormId(formId);
+  };
 
   if (isLoading) {
     return <div>Loading...</div>;
@@ -163,17 +167,22 @@ const AdminDashboard = () => {
       </div>
 
       {/* Forms submitted by users of the admin */}
-      <div className="bg-white rounded-lg shadow-md p-6 mb-6">
-        <h2 className="text-xl font-bold mb-2">Forms Submitted by Users</h2>
+      <div className="bg-white rounded-lg shadow-md p-6 mb-6 ">
+      <h2 className="text-xl font-bold mb-2">History</h2>
+        <div className=" justify-between items-center overflow-x-scroll">
+
+            <FormHistory />
+            </div>
+            <h2 className="text-xl font-bold mb-2 mt-10">Forms</h2>
+            <div className=" justify-between items-center overflow-x-scroll">
+
+
         {/* Forms Table */}
-        <table className="w-full">
+        <table className="table-auto w-full mb-4 bg-white shadow-md overflow-x-scroll">
           <thead>
             <tr>
               <th className="border px-4 py-2">Num</th>  
-              <th className="border px-4 py-2">User</th>
-              <th className="border px-4 py-2">Submitted At</th>
-              <th className="border px-4 py-2">Updated By</th>
-              <th className="border px-4 py-2">Updated At</th>
+              <th className="border px-4 py-2">Form Id</th>
               <th className="border px-4 py-2">Actions</th>
             </tr>
           </thead>
@@ -181,10 +190,7 @@ const AdminDashboard = () => {
             {forms.map(form => (
               <tr key={form._id}>
                 <td className="border px-4 py-2">{form.numId}</td>
-                <td className="border px-4 py-2">{form.userId}</td>
-                <td className="border px-4 py-2">{form.createdAt}</td>
-                <td className="border px-4 py-2">{form.lastEditedBy}</td>
-                <td className="border px-4 py-2">{form.updatedAt}</td>
+                <td className="border px-4 py-2">{form._id}</td>
                 <td className="border px-4 py-2">
                   <Link to={`/admin/forms/${form._id}`} className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
                     View
@@ -197,6 +203,7 @@ const AdminDashboard = () => {
             ))} 
           </tbody>
         </table>
+        </div>
       </div>
     </div>
     </>

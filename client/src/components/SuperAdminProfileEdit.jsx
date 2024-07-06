@@ -53,6 +53,7 @@ const SuperAdminProfileEdit = () => {
 
       // Update user data in the AuthContext
       setUser(response.data.user); 
+      Auth.setUser(response.data.user);
       setSuccessMessage('Profile updated successfully!');
     } catch (error) {
       console.error('Profile update error:', error);

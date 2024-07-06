@@ -9,7 +9,7 @@ import SignupPage from './components/SignupPage';
 import UserDashboard from './components/dashboards/UserDashboard';
 import AdminDashboard from './components/dashboards/AdminDashboard';
 import SuperAdminDashboard from './components/dashboards/SuperAdminDashboard';
-import QMSForm from './components/UserForms/QMSForm';
+import QMSForm from './components/dashboards/UserForms/QMSForm';
 import SuperAdminAddAdminForm from './components/SuperAdminDashboard/SuperAdminAddAdminForm';
 import AdminAddUserForm from './components/AdminDashboard/AdminAddUserForm';
 import AdminEditUserForm from './components/AdminDashboard/AdminEditUserForm';
@@ -26,6 +26,17 @@ axios.defaults.baseURL = 'http://localhost:5000';
 
 
 function App() {
+  let token = localStorage.getItem('token');
+  let user = localStorage.getItem('user');
+
+  if (token) {
+    axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+  }
+  else {
+    delete axios.defaults.headers.common['Authorization'];
+    localStorage.removeItem('user');
+    localStorage.removeItem('token');
+  }
 
 
   return (
@@ -43,7 +54,7 @@ function App() {
           <Route element={<ProtectedRoute roles={['user']} />}>
             <Route path="/user" element={<UserDashboard />} />
             <Route path="/user/profile" element={<ProfileEdit />} />
-            <Route path="/stats" element={<Stats />} />
+            <Route path="/user/stats" element={<Stats />} />
             <Route path="/user/forms/:formSubmissionId?" element={<QMSForm />} />
 
             {/* Redirect /login & /signup to dashboard if user is already logged in */}
@@ -61,6 +72,7 @@ function App() {
               {/* Redirect /login & /signup to dashboard if user is already logged in */}
             <Route path="/login" element={<Navigate to="/admin" />} />
             <Route path="/signup" element={<Navigate to="/admin" />} />
+            <Route path="/admin/forms/:formSubmissionId?" element={<QMSForm />} />
 
 
             {/* Add more admin routes here */}

@@ -1,10 +1,7 @@
 import React from "react";
 import Navbar from '../Navbar';
-import { AuthContext } from '../../context/AuthContext';
-import { useContext } from 'react';
 
 const Stats = () => {
-    const { user } = useContext(AuthContext);
     return (
         <div>
         <Navbar />

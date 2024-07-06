@@ -3,6 +3,7 @@ import React, { createContext, useState, useEffect } from 'react';
 import axios from 'axios';
 
 axios.defaults.baseURL = 'http://localhost:5000';
+
 if (localStorage.getItem('token')){
 axios.headers = {
   'Content-Type': 'application/json',
@@ -88,7 +89,8 @@ const AuthProvider = ({ children }) => {
         headers: { Authorization: `Bearer ${response.data.token}` },
       });
       setUser({ ...dataResponse.data, role: userRole });
-
+      localStorage.setItem('user', JSON.stringify(dataResponse.data));
+      
       return response.data; 
     } catch (error) {
       throw error; 
@@ -97,6 +99,8 @@ const AuthProvider = ({ children }) => {
 
   const logout = () => {
     localStorage.removeItem('token');
+    localStorage.removeItem('user');
+    localStorage.removeItem('role');
     setUser(null);
   };
 
