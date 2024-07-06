@@ -8,7 +8,6 @@ const formSubmissionSchema = new Schema({
     numId: { type: Number },
     adminId: { type: Schema.Types.ObjectId, ref: 'Admin', required: true },
     userId: { type: Schema.Types.ObjectId, ref: 'User', required: true },
-    lastEditedBy: { type: Schema.Types.ObjectId, ref: 'User', required: true },
     formData: { type: Object, required: true }, 
     dateSubmitted: { type: Date, default: Date.now }}
     , { timestamps: true });

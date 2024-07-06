@@ -4,6 +4,7 @@ const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const User = require('../models/userModel');
 const FormSubmission = require('../models/formSubmissionModel');
+const FormHistory = require('../models/formHistoryModel');
 const auth = require('../middleware/auth');
 
 // Get Current User
@@ -81,12 +82,20 @@ router.post('/submit-form', async (req, res) => {
         const newFormSubmission = new FormSubmission({
             adminId: adminId,
             userId: userId,
-            lastEditedBy: userId,
             formData,
         });
     
         // Enregistrer la soumission
         const formSubmission = await newFormSubmission.save();
+
+         // Créer une entrée d'historique
+         const newHistoryEntry = new FormHistory({
+            formSubmissionId: formSubmission._id,
+            userId, 
+            action: 'created',
+            // No need for originalData or updatedData here
+        });
+        await newHistoryEntry.save();
 
         res.status(201).json(formSubmission);
     
@@ -107,6 +116,16 @@ router.put('/update-form/:formSubmissionId', async (req, res) => {
         if (!formSubmission) {
             return res.status(404).json({ error: 'Soumission de formulaire non trouvée' });
         }
+
+         // Créer une entrée d'historique 
+         const newHistoryEntry = new FormHistory({
+            formSubmissionId,
+            userId: req.body.userId,
+            action: 'updated',
+            originalData: formSubmission.formData, // Store the original data 
+            updatedData: updatedFormData // Store the updated data
+        });
+        await newHistoryEntry.save();
 
         res.status(200).json(formSubmission);
 
@@ -130,6 +149,17 @@ router.delete('/delete-form/:formSubmissionId', async (req, res) => {
 
         // Retirer la soumission de l'utilisateur
         const user = await User.findOneAndUpdate(deletedFormSubmission.userId, { $pull: { formSubmissions: formSubmissionId } });
+
+        
+        // Créer une entrée d'historique
+        const newHistoryEntry = new FormHistory({
+            formSubmissionId,
+            userId: req.body.userId,
+            action: 'deleted',
+            originalData: formSubmission.formData // Store the original data
+            // No need for updatedData here
+        });
+        await newHistoryEntry.save(); 
 
         res.status(200).json({ message: 'Soumission de formulaire supprimée' });
 
@@ -191,9 +221,8 @@ router.delete('/forms', async (req, res) => {
 
 
 // edit user profile
-router.put('/profile', auth, async (req, res) => {
+router.put('/profile', async (req, res) => {
     try {
-      const userId = req.user._id; 
       const updatedData = req.body;
   
       // Exclude password if not provided
@@ -205,7 +234,7 @@ router.put('/profile', auth, async (req, res) => {
         updatedData.password = await bcrypt.hash(updatedData.password, salt);
       }
   
-      const updatedUser = await User.findByIdAndUpdate(userId, updatedData, { new: true });
+      const updatedUser = await User.findByIdAndUpdate(updatedData._id, updatedData, { new: true });
   
       if (!updatedUser) {
         return res.status(404).json({ error: 'User not found' });
