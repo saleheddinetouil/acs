@@ -4,10 +4,27 @@ import axios from 'axios';
 
 axios.defaults.baseURL = 'http://localhost:5000';
 
+if (localStorage.getItem('token')){
+axios.headers = {
+  'Content-Type': 'application/json',
+'Authorization': `Bearer ${localStorage.getItem('token')}`
+};
+}
+else {
+  localStorage.removeItem('token');
+axios.headers = {
+  'Content-Type': 'application/json'
+};
+}
+
+
+
+
 const AuthContext = createContext();
 
 const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
+  
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
@@ -20,6 +37,9 @@ const AuthProvider = ({ children }) => {
           const role = decodedToken.userId ? 'user' :
                        decodedToken.adminId ? 'admin' :
                        decodedToken.superAdminId ? 'superadmin' : null;
+          const isAdmin = role === 'admin';
+          const isSuperAdmin = role === 'superadmin';
+          
 
           
           if (!role) {
@@ -69,7 +89,8 @@ const AuthProvider = ({ children }) => {
         headers: { Authorization: `Bearer ${response.data.token}` },
       });
       setUser({ ...dataResponse.data, role: userRole });
-
+      localStorage.setItem('user', JSON.stringify(dataResponse.data));
+      
       return response.data; 
     } catch (error) {
       throw error; 
@@ -78,6 +99,8 @@ const AuthProvider = ({ children }) => {
 
   const logout = () => {
     localStorage.removeItem('token');
+    localStorage.removeItem('user');
+    localStorage.removeItem('role');
     setUser(null);
   };
 

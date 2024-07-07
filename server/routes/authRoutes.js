@@ -8,6 +8,34 @@ const User = require('../models/userModel');
 const Admin = require('../models/adminModel');
 const SuperAdmin = require('../models/superAdminModel');
 
+// Route pour avoir le role de l'utilisateur à partir d'adresse email
+router.post('/role', async (req, res) => {
+    try {
+        let user = await User.findOne({ email: req.body.email });
+
+        if (user) {
+            return res.status(200).json({ role: 'user' });
+        }
+
+        let admin = await Admin.findOne({ email: req.body.email });
+
+        if (admin) {
+            return res.status(200).json({ role: 'admin' });
+        }
+
+        let superAdmin = await SuperAdmin.findOne({ email : req.body.email });
+
+        if (superAdmin) {
+            return res.status(200).json({ role: 'superadmin' });
+        }
+
+        res.status(404).json({ error: 'Utilisateur non trouvé' });
+    } catch (err) {
+        console.error('Erreur lors de la recherche du rôle:', err);
+        res.status(500).json({ error: 'Erreur lors de la recherche du rôle' });
+    }
+});
+
 
 // Route pour la connexion des utilisateurs
 router.post('/user', async (req, res) => {

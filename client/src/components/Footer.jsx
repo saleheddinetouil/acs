@@ -20,20 +20,15 @@ const Footer = () => {
           </div>
           <div className="w-full md:w-1/4 px-4 mb-6 md:mb-0">
             <h4 className="text-lg font-bold mb-4">Address</h4>
-            <p className="text-sm font-medium">ACS QMS</p>
-            <p className="text-sm font-medium">02 Rue ibn moukafaa</p>
-            <p className="text-sm font-medium">City, State, 2046</p>
+            <p className="text-sm font-medium">ACS</p>
+            <p className="text-sm font-medium">L'Aouina, Diar Sokra D472</p>
+    
           </div>
           <div className="w-full md:w-1/4 px-4 mb-6 md:mb-0">
             <h4 className="text-lg font-bold mb-4">Follow Us</h4>
             <div className="flex space-x-4 items-center justify-center">
-              <a href="#" className="hover:text-blue-400">
-                <i className="fab fa-facebook-f text-2xl"></i>
-              </a>
-              <a href="#" className="hover:text-blue-400">
-                <i className="fab fa-twitter text-2xl"></i>
-              </a>
-              <a href="#" className="hover:text-blue-400">
+
+              <a href="https://www.linkedin.com/in/ab-consulting-et-services-benhamad-03b43424/" className="hover:text-blue-400">
                 <i className="fab fa-linkedin-in text-2xl"></i>
               </a>
             </div>

@@ -1,5 +1,6 @@
 import React, {  } from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom'; 
+import { useState, useEffect, useContext } from 'react';
 import { AuthProvider } from './context/AuthContext'; 
 import ProtectedRoute from './components/ProtectedRoute'; 
 import LandingPage from './components/LandingPage';
@@ -8,7 +9,7 @@ import SignupPage from './components/SignupPage';
 import UserDashboard from './components/dashboards/UserDashboard';
 import AdminDashboard from './components/dashboards/AdminDashboard';
 import SuperAdminDashboard from './components/dashboards/SuperAdminDashboard';
-import QMSForm from './components/UserForms/QMSForm';
+import QMSForm from './components/dashboards/UserForms/QMSForm';
 import SuperAdminAddAdminForm from './components/SuperAdminDashboard/SuperAdminAddAdminForm';
 import AdminAddUserForm from './components/AdminDashboard/AdminAddUserForm';
 import AdminEditUserForm from './components/AdminDashboard/AdminEditUserForm';
@@ -16,14 +17,28 @@ import SuperadminEditAdminForm from './components/SuperAdminDashboard/Superadmin
 import ProfileEdit from './components/ProfileEdit';
 import AdminProfileEdit from './components/AdminProfileEdit';
 import SuperAdminProfileEdit from './components/SuperAdminProfileEdit';
+import Stats from './components/dashboards/Stats';
 import axios from 'axios';
-
+import { AuthContext } from './context/AuthContext';
 import './App.css';
 
 axios.defaults.baseURL = 'http://localhost:5000';
 
 
 function App() {
+  let token = localStorage.getItem('token');
+  let user = localStorage.getItem('user');
+
+  if (token) {
+    axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+  }
+  else {
+    delete axios.defaults.headers.common['Authorization'];
+    localStorage.removeItem('user');
+    localStorage.removeItem('token');
+  }
+
+
   return (
     <AuthProvider>
       <div className="App">
@@ -33,18 +48,32 @@ function App() {
           <Route path="/login" element={<LoginPage />} />
           <Route path="/signup" element={<SignupPage />} />
 
+
+
           {/* Protected Routes */}
           <Route element={<ProtectedRoute roles={['user']} />}>
             <Route path="/user" element={<UserDashboard />} />
-            <Route path="/profile" element={<ProfileEdit />} />
-            <Route path="/user/forms/:formSubmissionId?" element={<QMSForm />} /> 
+            <Route path="/user/profile" element={<ProfileEdit />} />
+            <Route path="/user/stats" element={<Stats />} />
+            <Route path="/user/forms/:formSubmissionId?" element={<QMSForm />} />
+
+            {/* Redirect /login & /signup to dashboard if user is already logged in */}
+            <Route path="/login" element={<Navigate to="/user" />} />
+            <Route path="/signup" element={<Navigate to="/user" />} />
+
           </Route>
 
           <Route element={<ProtectedRoute roles={['admin']} />}>
             <Route path="/admin" element={<AdminDashboard />} />
+            <Route path="/admin/stats" element={<Stats />} />
             <Route path="/admin/profile" element={<AdminProfileEdit  />} />
             <Route path="/admin/users/add" element={<AdminAddUserForm />} />
             <Route path="/admin/users/:userId/edit" element={<AdminEditUserForm />} /> 
+              {/* Redirect /login & /signup to dashboard if user is already logged in */}
+            <Route path="/login" element={<Navigate to="/admin" />} />
+            <Route path="/signup" element={<Navigate to="/admin" />} />
+            <Route path="/admin/forms/:formSubmissionId?" element={<QMSForm />} />
+
 
             {/* Add more admin routes here */}
           </Route>
@@ -55,10 +84,16 @@ function App() {
             <Route path="/superadmin/admins/add" element={<SuperAdminAddAdminForm />} />
             <Route path="/superadmin/admins/:adminId/edit" element={<SuperadminEditAdminForm />} /> 
             {/* Add more superadmin routes here */}
+              {/* Redirect /login & /signup to dashboard if user is already logged in */}
+            <Route path="/login" element={<Navigate to="/superadmin" />} />
+            <Route path="/signup" element={<Navigate to="/superadmin" />} />
+
           </Route>
 
           {/* Redirect to home if no match */}
           <Route path="*" element={<Navigate to="/" />} />
+
+
         </Routes>
       </div>
     </AuthProvider>

@@ -4,6 +4,8 @@ const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const Admin = require('../models/adminModel');
 const User = require('../models/userModel'); 
+const Form = require('../models/formSubmissionModel');
+const FormHistory = require('../models/formHistoryModel');
 const auth = require('../middleware/auth');
 const nodemailer = require('nodemailer');
 
@@ -15,6 +17,27 @@ const transporter = nodemailer.createTransport({
       pass: process.env.SMTP_PASS // Your email password (use app password for Gmail)
     }
   });
+
+// Route pour obtenir tous les forms soumis par les utilisateurs d'un admin
+router.post('/forms', async (req, res) => {
+    try {
+        const adminId = req.body.adminId;
+
+        // Trouver les utilisateurs de l'admin
+        const users = await User.find({ adminId: adminId });
+
+        // Extraire les IDs des utilisateurs
+        const userIds = users.map(user => user._id);
+
+        // Trouver les forms soumis par les utilisateurs
+        const forms = await Form.find({ userId: { $in: userIds } });
+
+        res.status(200).json(forms);
+    } catch (err) {
+        console.error('Erreur lors de la récupération des forms:', err);
+        res.status(500).json({ error: 'Erreur lors de la récupération des forms' });
+    }
+});
 
 // Route pour obtenir l'admin actuel
 router.get('/', auth, async (req, res) => {
@@ -377,7 +400,7 @@ router.get('/users/:userId', auth, async (req, res) => {
         updatedData.password = await bcrypt.hash(updatedData.password, salt);
       }
 
-      const updatedUser = await Admin.findByIdAndUpdate(userId, updatedData, { new: true });
+      const updatedUser = await Admin.findByIdAndUpdate(userId, updatedData);
 
       if (!updatedUser) {
         return res.status(404).json({ error: 'Admin not found' });
@@ -391,6 +414,20 @@ router.get('/users/:userId', auth, async (req, res) => {
 
   }
   );
+
+// Route pour append du history
+router.get('/form-history', async (req, res) => {
+  try {
+    
+    // Fetch all history entries 
+    const history = await FormHistory.find().populate('userId').sort({ timestamp: -1 });
+
+    res.status(200).json(history);
+  } catch (err) {
+    console.error('Error fetching form history:', err);
+    res.status(500).json({ error: 'Error fetching form history' });
+  }
+});
 
   
 

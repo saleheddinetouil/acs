@@ -67,6 +67,7 @@ const AdminProfileEdit = () => {
 
       // Update user data in the AuthContext
       setUser(response.data.user); 
+      Auth.setUser(response.data.user);
       setSuccessMessage('Profile updated successfully!');
     } catch (error) {
       console.error('Profile update error:', error);
@@ -98,7 +99,8 @@ const AdminProfileEdit = () => {
           {error}
         </div>
       )}
-        
+
+
       <form onSubmit={handleSubmit} className="bg-white rounded-lg shadow-md p-6">
         <div className="mb-4">
           <label htmlFor="firstName" className="block text-gray-700 font-bold mb-2 text-left">First Name:</label>

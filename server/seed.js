@@ -15,9 +15,10 @@ const seed = async () => {
         });
 
         // Supprimer toutes les données de la base de données
-        await Admin.deleteMany();
-        await SuperAdmin.deleteMany();
-        await User.deleteMany();
+        await Admin.deleteMany({});
+        await SuperAdmin.deleteMany({});
+        await User.deleteMany({});
+        
 
         // Création du super admin
         const superAdmin = new SuperAdmin({

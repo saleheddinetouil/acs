@@ -6,9 +6,8 @@ import Auth from '../utils/Auth';
 import Navbar from './Navbar';
 
 const ProfileEdit = () => {
-  const { user, logout } = useContext(AuthContext);
+  const { user } = useContext(AuthContext);
   const navigate = useNavigate();
-  const [users,setUser] = useState(null);
   const [formData, setFormData] = useState({
     firstName: '',
     lastName: '',
@@ -25,10 +24,12 @@ const ProfileEdit = () => {
   useEffect(() => {
     if (user.role === 'user') {
         setFormData({
+            _id: user._id,
             firstName: user.firstName,
             lastName: user.lastName,
             email: user.email,
             phone: user.phone,
+            password: '',
             
         });
     } else if (user.role === 'admin') {
@@ -38,12 +39,16 @@ const ProfileEdit = () => {
             email: user.email,
             phone: user.phone,
             businessName: user.businessName,
+            password: '',
         });
     } else if (user.role === 'superadmin') {
         setFormData({
             firstName: user.firstName,
             lastName: user.lastName,
             email: user.email,
+            phone: user.phone,
+            password: '',
+            
         });
     }
     setIsLoading(false);
@@ -60,16 +65,15 @@ const ProfileEdit = () => {
     setError(null); 
 
     try {
-      const response = await axios.put('/user/profile', formData, {
+      const response = await axios.put('/'+user.role+'/profile', formData, {
         headers: Auth.authHeader()
       });
-
-      // Update user data in the AuthContext
-      setUser(response.data.user); 
+      // refresh user data
+      Auth.setUser(response.data.user);
       setSuccessMessage('Profile updated successfully!');
     } catch (error) {
       console.error('Profile update error:', error);
-      setError(error.response.data.error || 'Failed to update profile.');
+      setError('Failed to update profile.');
     }
   };
 
@@ -97,7 +101,7 @@ const ProfileEdit = () => {
           {error}
         </div>
       )}
-        
+      
       <form onSubmit={handleSubmit} className="bg-white rounded-lg shadow-md p-6">
         <div className="mb-4">
           <label htmlFor="firstName" className="block text-gray-700 font-bold mb-2 text-left">First Name:</label>
@@ -167,6 +171,14 @@ const ProfileEdit = () => {
         >
           Save Changes
         </button>
+        <button 
+          onClick={() => navigate(-1)}
+          className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline ml-4"
+        >
+          Cancel
+        </button>
+
+
       </form>
     </div>
     </>
