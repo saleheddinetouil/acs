@@ -1,6 +1,7 @@
 // src/context/AuthContext.js
 import React, { createContext, useState, useEffect } from 'react';
 import axios from 'axios';
+import Auth from '../utils/Auth';
 
 axios.defaults.baseURL = 'http://localhost:5000';
 
@@ -37,8 +38,6 @@ const AuthProvider = ({ children }) => {
           const role = decodedToken.userId ? 'user' :
                        decodedToken.adminId ? 'admin' :
                        decodedToken.superAdminId ? 'superadmin' : null;
-          const isAdmin = role === 'admin';
-          const isSuperAdmin = role === 'superadmin';
           
 
           

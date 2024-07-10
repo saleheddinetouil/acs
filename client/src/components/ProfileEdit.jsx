@@ -9,14 +9,15 @@ const ProfileEdit = () => {
   const { user } = useContext(AuthContext);
   const navigate = useNavigate();
   const [formData, setFormData] = useState({
+    _id: '',
     firstName: '',
     lastName: '',
     email: '',
     password: '', // Optional: for password change
     phone: '',
-    businessName: '',
-
+    businessName: ''
   });
+
   const [isLoading, setIsLoading] = useState(true); 
   const [successMessage, setSuccessMessage] = useState(null);
   const [error, setError] = useState(null);
@@ -75,6 +76,7 @@ const ProfileEdit = () => {
       console.error('Profile update error:', error);
       setError('Failed to update profile.');
     }
+    // refresh data 
   };
 
   if (isLoading) {

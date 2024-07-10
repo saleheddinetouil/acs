@@ -388,7 +388,7 @@ router.get('/users/:userId', auth, async (req, res) => {
 
   router.put('/profile', auth, async (req, res) => {
     try {
-      const userId = req.body.userId;
+      const adminId = req.body.adminId;
       const updatedData = req.body;
 
       // Exclude password if not provided
@@ -400,7 +400,7 @@ router.get('/users/:userId', auth, async (req, res) => {
         updatedData.password = await bcrypt.hash(updatedData.password, salt);
       }
 
-      const updatedUser = await Admin.findByIdAndUpdate(userId, updatedData);
+      const updatedUser = await Admin.findByIdAndUpdate(adminId, updatedData);
 
       if (!updatedUser) {
         return res.status(404).json({ error: 'Admin not found' });

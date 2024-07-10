@@ -1,11 +1,15 @@
 // Desc: Auth helper functions
 // import JSON.parse 
+import axios from 'axios';
 import JSON from 'json5';
+
+axios.defaults.baseURL = 'http://localhost:5000';
 
 
 const Auth = {
   getUser : () => {
-    return localStorage.getItem('user') ? localStorage.getItem('user') : null;
+    return JSON.parse(localStorage.getItem('user'));
+
   },
 
   getToken: () => {
