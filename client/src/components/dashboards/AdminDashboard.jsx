@@ -1,13 +1,12 @@
 import React, { useState, useEffect, useContext } from 'react';
 import axios from 'axios';
-import { Link,Navigate } from 'react-router-dom';
+import { Link, Navigate } from 'react-router-dom';
 import { AuthContext } from '../../context/AuthContext';
 import UserTable from '../UserTable';
 import Auth from '../../utils/Auth';
 import Navbar from '../Navbar';
 import PaymentPage from '../PaymentPage';
 import FormHistory from './FormHistory';
-
 
 const AdminDashboard = () => {
   const { user } = useContext(AuthContext);
@@ -16,6 +15,9 @@ const AdminDashboard = () => {
   const [admin, setAdmin] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [selectedFormId, setSelectedFormId] = useState(null);
+  const [searchQuery, setSearchQuery] = useState(''); // State for form search
+  const [searchBy, setSearchBy] = useState('formId'); // State for search type
+  const [filteredForms, setFilteredForms] = useState([]); // State for filtered forms
 
   useEffect(() => {
     const fetchAdmin = async () => {
@@ -29,26 +31,23 @@ const AdminDashboard = () => {
       }
     };
 
-
-
     const fetchForms = async () => {
       try {
         const response = await axios.post('/admin/forms',
-        {adminId:user._id}, {
-          headers: "Bearer " + Auth.getToken(),
-      });
+          { adminId: user._id }, {
+            headers: "Bearer " + Auth.getToken(),
+          });
         setForms(response.data);
+        setFilteredForms(response.data); // Initialize filteredForms with all forms
       } catch (error) {
         console.error('Error fetching forms:', error);
       }
     };
 
-
-
     const fetchUsers = async () => {
       const adminId = user._id;
       try {
-        const response = await axios.post('/admin/users',{adminId:adminId} ,{
+        const response = await axios.post('/admin/users', { adminId: adminId }, {
           headers: "Bearer " + Auth.getToken(),
         });
         if (response.data.length === 0) {
@@ -71,144 +70,152 @@ const AdminDashboard = () => {
       fetchAdmin();
       setAdmin(user);
     }
-
-
-
   }, [user]);
+
   const handleFormSelect = (formId) => {
     setSelectedFormId(formId);
   };
 
+  const handleSearchInputChange = (e) => {
+    setSearchQuery(e.target.value);
+  };
+
+  const handleSearchTypeChange = (e) => {
+    setSearchBy(e.target.value);
+  };
+
+  useEffect(() => {
+    const filtered = forms.filter(form => {
+      if (searchBy === 'formId') {
+        return form._id.toString().includes(searchQuery);
+      } else if (searchBy === 'numId') {
+        return form.numId.toString().includes(searchQuery);
+      }
+      return true; // If no search, show all
+    });
+    setFilteredForms(filtered);
+  }, [searchQuery, searchBy, forms]); // Update filteredForms on query or search type change
+
   if (isLoading) {
     return <div>Loading...</div>;
   }
+
   let closureRate = 0;
   if (forms.length > 0) {
     closureRate = (forms.filter(form => form.status === 'closed').length / forms.length) * 100;
     console.log(closureRate);
   }
 
-
   if (!user) {
     return <Navigate to="/login" replace />;
-  }
-  else if (!user.isPaid){
-    return(
+  } else if (!user.isPaid) {
+    return (
       <>
-      <PaymentPage />
+        <PaymentPage />
+      </>
+    );
+  } else {
+    return (
+      <>
+        <Navbar />
+
+        <div className="container mx-auto px-4 py-8">
+
+          <h1 className="text-3xl font-bold mb-4">Admin Dashboard</h1>
+
+          {/* Display Admin Indicators */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            <div className="bg-yellow-500 rounded-lg shadow-md p-6 mb-6">
+              <div className="flex justify-between items-center">
+                <h3 className="text-lg font-bold text-gray-800">Total Users</h3>
+                <i className="fas fa-users fa-2x text-gray-800 opacity-75"></i>
+              </div>
+              <p className="text-3xl font-bold text-gray-800">{users.length}</p>
+            </div>
+            <div className="bg-blue-500 rounded-lg shadow-md p-6 mb-6">
+              <div className="flex justify-between items-center">
+                <h3 className="text-lg font-bold text-gray-800">Total Forms</h3>
+                <i className="fas fa-file-alt fa-2x text-gray-800 opacity-75"></i>
+              </div>
+              <p className="text-3xl font-bold text-gray-800">{forms.length}</p>
+            </div>
+            <div className="shadow-md bg-green-500 rounded-lg p-6 mb-6">
+              <div className="flex justify-between items-center">
+                <h3 className="text-lg font-bold text-gray-800">Closure Rate</h3>
+                <i className="fas fa-chart-line fa-2x text-gray-800 opacity-75"></i>
+              </div>
+              <p className="text-3xl font-bold text-gray-800">{closureRate}</p>
+            </div>
+          </div>
+
+          {/* User Management Section */}
+          <div className="bg-white rounded-lg shadow-md p-6 mb-6">
+            <h2 className="text-xl font-bold mb-2">User Management</h2>
+            <UserTable users={users} />
+
+            {/* Add User Button */}
+            <Link
+              to="/admin/users/add" // Update to your add user page route
+              className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded mt-4 inline-block"
+            >
+              Add User
+            </Link>
+          </div>
+
+          {/* Forms submitted by users of the admin */}
+          <div className="bg-white rounded-lg shadow-md p-6 mb-6 ">
+            <h2 className="text-xl font-bold mb-2">History</h2>
+            <div className=" justify-between items-center overflow-x-scroll">
+              <FormHistory />
+            </div>
+
+            <h2 className="text-xl font-bold mb-2 mt-10">Forms</h2>
+            <div className="mb-4 text-right">
+              <input
+                type="text"
+                placeholder="Search by Form Id or NumId"
+                value={searchQuery}
+                onChange={handleSearchInputChange}
+                className="border rounded px-3 py-2 mr-2"
+              />
+
+              {/* Search By Dropdown */}
+              <select value={searchBy} onChange={handleSearchTypeChange} className="border rounded px-2 py-1">
+              <option value="numId">NumId</option>
+                <option value="formId">Form Id</option>
+
+              </select>
+            </div>
+            <div className=" justify-between items-center overflow-x-scroll">
+              {/* Forms Table */}
+              <table className="table-auto w-full mb-4 bg-white shadow-md overflow-x-scroll">
+                <thead>
+                  <tr>
+                    <th className="border px-4 py-2">Num</th>
+                    <th className="border px-4 py-2">Form Id</th>
+                    <th className="border px-4 py-2">Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {filteredForms.map(form => (
+                    <tr key={form._id}>
+                      <td className="border px-4 py-2">{form.numId}</td>
+                      <td className="border px-4 py-2">{form._id}</td>
+                      <td className="border px-4 py-2">
+                        <Link to={`/admin/forms/${form._id}`} className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+                          View
+                        </Link>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
       </>
     );
   }
-  else
-  {
-  return (
-    <>
-    <Navbar />
-    
-    <div className="container mx-auto px-4 py-8">
-      
-      <h1 className="text-3xl font-bold mb-4">Admin Dashboard</h1>
-
-
-      {/*
-      
-      
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-
-      <div className="bg-white rounded-lg shadow-lg p-6 bg-indigo-500"> 
-        <div className="flex justify-between items-center">
-          <h3 className="text-xl font-bold text-white">Total Forms</h3>
-          <i className="fas fa-chart-line fa-2x text-white opacity-75"></i> 
-        </div>
-        <p className="text-3xl font-bold text-white">10</p>
-      </div>
-
-      
-      */}
-         {/* Display Admin Indicators */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-        <div className="bg-yellow-500 rounded-lg shadow-md p-6 mb-6">
-          <div className="flex justify-between items-center">
-            <h3 className="text-lg font-bold text-gray-800">Total Users</h3>
-            <i className="fas fa-users fa-2x text-gray-800 opacity-75"></i>
-          </div>
-          <p className="text-3xl font-bold text-gray-800">{users.length}</p>
-        </div>
-        <div className="bg-blue-500 rounded-lg shadow-md p-6 mb-6">
-          <div className="flex justify-between items-center">
-            <h3 className="text-lg font-bold text-gray-800">Total Forms</h3>
-            <i className="fas fa-file-alt fa-2x text-gray-800 opacity-75"></i>
-          </div>
-          <p className="text-3xl font-bold text-gray-800">{forms.length}</p>
-        </div>
-        <div className="shadow-md bg-green-500 rounded-lg p-6 mb-6">
-          <div className="flex justify-between items-center">
-            <h3 className="text-lg font-bold text-gray-800">Closure Rate</h3>
-            <i className="fas fa-chart-line fa-2x text-gray-800 opacity-75"></i>
-            </div>
-          <p className="text-3xl font-bold text-gray-800">{closureRate}</p>
-          </div>
-
-
-      </div>
-
-      {/* User Management Section */}
-      <div className="bg-white rounded-lg shadow-md p-6 mb-6">
-        <h2 className="text-xl font-bold mb-2">User Management</h2>
-        <UserTable users={users} />
-
-        {/* Add User Button */}
-        <Link 
-          to="/admin/users/add" // Update to your add user page route
-          className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded mt-4 inline-block"
-        >
-          Add User
-        </Link>
-      </div>
-
-      {/* Forms submitted by users of the admin */}
-      <div className="bg-white rounded-lg shadow-md p-6 mb-6 ">
-      <h2 className="text-xl font-bold mb-2">History</h2>
-        <div className=" justify-between items-center overflow-x-scroll">
-
-            <FormHistory />
-            </div>
-            <h2 className="text-xl font-bold mb-2 mt-10">Forms</h2>
-            <div className=" justify-between items-center overflow-x-scroll">
-
-
-        {/* Forms Table */}
-        <table className="table-auto w-full mb-4 bg-white shadow-md overflow-x-scroll">
-          <thead>
-            <tr>
-              <th className="border px-4 py-2">Num</th>  
-              <th className="border px-4 py-2">Form Id</th>
-              <th className="border px-4 py-2">Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            {forms.map(form => (
-              <tr key={form._id}>
-                <td className="border px-4 py-2">{form.numId}</td>
-                <td className="border px-4 py-2">{form._id}</td>
-                <td className="border px-4 py-2">
-                  <Link to={`/admin/forms/${form._id}`} className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
-                    View
-                  </Link>
-                </td>
-                
-
-
-              </tr>
-            ))} 
-          </tbody>
-        </table>
-        </div>
-      </div>
-    </div>
-    </>
-  );
-}
 };
 
 export default AdminDashboard;

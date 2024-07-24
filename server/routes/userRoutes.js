@@ -136,27 +136,24 @@ router.put('/update-form/:formSubmissionId', async (req, res) => {
 });
 
 // Route pour supprimer une soumission de formulaire
-router.delete('/delete-form/:formSubmissionId', async (req, res) => {
+router.post('/delete-form/', async (req, res) => {
     try {
-        const formSubmissionId = req.params.formSubmissionId;
-
-        // Trouver et supprimer la soumission du formulaire
+        const formSubmissionId = req.body.submissionId;
+        const userId = req.body.userId;
+        const adminId = req.body.adminId;
+        
         const deletedFormSubmission = await FormSubmission.findByIdAndDelete(formSubmissionId);
 
         if (!deletedFormSubmission) {
             return res.status(404).json({ error: 'Soumission de formulaire non trouvée' });
         }
 
-        // Retirer la soumission de l'utilisateur
-        const user = await User.findOneAndUpdate(deletedFormSubmission.userId, { $pull: { formSubmissions: formSubmissionId } });
-
-        
         // Créer une entrée d'historique
         const newHistoryEntry = new FormHistory({
             formSubmissionId,
             userId: req.body.userId,
             action: 'deleted',
-            originalData: formSubmission.formData // Store the original data
+            originalData: deletedFormSubmission.formData,
             // No need for updatedData here
         });
         await newHistoryEntry.save(); 

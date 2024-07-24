@@ -121,7 +121,7 @@ const UserDashboard = () => {
 // Function to delete a form submission
   const handleDeleteSubmission = async (submissionId) => {
     try {
-      await axios.delete(`/user/delete-form/${submissionId}`, 
+      await axios.post(`/user/delete-form`, 
         {adminId:user.adminId, userId:user._id, submissionId:submissionId},
         {
         headers: Auth.authHeader(),
